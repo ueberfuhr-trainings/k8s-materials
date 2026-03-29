@@ -23,3 +23,4 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 3. [ConfigMaps verwenden](issues/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
 4. [PostgreSQL-Datenbank](issues/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
 5. [Backend auf PostgreSQL umschalten](issues/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
+6. [Liveness- und Readiness-Probes](issues/06-probes.html) — Health Checks für Backend, Frontend und Datenbank

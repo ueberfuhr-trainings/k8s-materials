@@ -49,6 +49,7 @@ Die Übungen im `issues/`-Ordner folgen einem Template (`issue_template.md`) mit
 3. **ConfigMaps** — Backend-URL in ConfigMap auslagern
 4. **PostgreSQL-Setup** — PostgreSQL-Deployment, Secrets, ConfigMaps für Init-SQL
 5. **Backend auf PostgreSQL umschalten** — `latest`-Tag mit DB-Konfiguration aus Secrets
+6. **Liveness- und Readiness-Probes** — Health Checks für Backend, Frontend und Datenbank
 
 ## Hinweise für die Generierung
 

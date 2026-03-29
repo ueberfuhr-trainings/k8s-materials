@@ -11,7 +11,6 @@ Als Entwickler möchte ich das Recipes-Backend als Container in OpenShift deploy
 
 * Du kannst ein Deployment mit einem YAML-Manifest erstellen und auf den Cluster anwenden.
 * Du kannst Fehler in Pods mit `oc describe pod` und `oc logs` analysieren.
-* Du verstehst den Unterschied zwischen verschiedenen Image-Tags und deren Auswirkung auf die Laufzeitkonfiguration.
 * Du kannst einen Service und eine Route erstellen, um eine Anwendung im Cluster und von außen erreichbar zu machen.
 
 ## ✅ Definition of Done
@@ -24,7 +23,18 @@ Als Entwickler möchte ich das Recipes-Backend als Container in OpenShift deploy
 
 ## 🪜 Arbeitsschritte
 
-### 1. Deployment erstellen
+### 1. Pull Secret erstellen
+
+Da die Container-Images von Docker Hub gezogen werden, benötigst Du ein Pull Secret mit Deinen Docker Hub-Zugangsdaten:
+
+```bash
+oc create secret docker-registry dockerhub-pull-secret \
+  --docker-server=docker.io \
+  --docker-username=<dein-dockerhub-username> \
+  --docker-password=<dein-dockerhub-token>
+```
+
+### 2. Deployment erstellen
 
 Erstelle eine Datei `backend-deployment.yaml` mit folgendem Inhalt:
 
@@ -43,6 +53,8 @@ spec:
       labels:
         app: recipes-backend
     spec:
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
       containers:
         - name: recipes-backend
           image: ralfueberfuhr/recipes-backend:latest
@@ -56,7 +68,7 @@ Wende das Manifest an:
 oc apply -f backend-deployment.yaml
 ```
 
-### 2. Fehler analysieren
+### 3. Fehler analysieren
 
 Der Pod wird in einen Fehlerzustand laufen, weil das `latest`-Tag eine PostgreSQL-Datenbank erwartet. Untersuche den Fehler:
 
@@ -68,7 +80,7 @@ oc logs <pod-name>
 
 Du solltest eine Fehlermeldung sehen, die auf eine fehlende Datenbankkonfiguration hinweist.
 
-### 3. Auf `latest-dev` wechseln
+### 4. Auf `latest-dev` wechseln
 
 Ändere in deinem YAML das Image-Tag von `latest` auf `latest-dev`. Dieses Tag enthält eine eingebaute H2 InMemory-Datenbank und benötigt keine externe Datenbank.
 
@@ -84,7 +96,7 @@ oc get pods
 oc logs <pod-name>
 ```
 
-### 4. Service erstellen
+### 5. Service erstellen
 
 Erstelle eine Datei `backend-service.yaml`:
 
@@ -105,7 +117,7 @@ spec:
 oc apply -f backend-service.yaml
 ```
 
-### 5. Route erstellen
+### 6. Route erstellen
 
 Erstelle eine Datei `backend-route.yaml`:
 
