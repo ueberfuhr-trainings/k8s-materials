@@ -26,7 +26,31 @@ OpenShift enthält Kubernetes vollständig, ergänzt es aber um wichtige Funktio
 | **Monitoring** | Manuell einzurichten (Prometheus, Grafana) | **Integriertes Monitoring** und Alerting (vorkonfiguriert) |
 | **Logging** | Manuell einzurichten (EFK-Stack) | Integrierte **Log-Aggregation** |
 | **Support** | Community-Support | **Enterprise-Support** von Red Hat mit langfristiger Stabilität und Sicherheitspatches |
+| **CLI** | `kubectl` | **`oc`** — kompatibel mit kubectl, plus OpenShift-spezifische Befehle |
+| **Namespaces** | Namespaces | **Projects** — Namespaces mit zusätzlichen Metadaten und Berechtigungen |
 | **Updates** | Manuell, komplex | Automatisierte **Cluster-Updates** über den Operator Lifecycle Manager |
+
+### CLI: oc vs. kubectl
+
+OpenShift verwendet das CLI-Tool **oc**, das **vollständig kompatibel** mit `kubectl` ist — jeder `kubectl`-Befehl funktioniert auch mit `oc`. Zusätzlich bietet `oc` OpenShift-spezifische Befehle wie `oc login`, `oc new-project` oder `oc expose`. Siehe [kubectl/oc Cheat Sheet](cli-cheatsheet.html) für eine Übersicht der wichtigsten Befehle.
+
+### Projects vs. Namespaces
+
+In Kubernetes heißt die logische Isolation **Namespace**. OpenShift verwendet stattdessen den Begriff **Project**. Ein Project ist technisch ein Kubernetes-Namespace mit zusätzlichen Funktionen:
+
+- **Anzeigename und Beschreibung** — für eine bessere Übersicht in der Web-Konsole
+- **Selbstbedienung** — Entwickler können eigene Projects anlegen (konfigurierbar)
+- **Standard-Berechtigungen** — der Ersteller erhält automatisch Admin-Rechte auf das Project
+
+```bash
+# Project erstellen (OpenShift)
+oc new-project mein-projekt --display-name="Mein Projekt"
+
+# Entspricht in Kubernetes:
+kubectl create namespace mein-projekt
+```
+
+Jeder `oc`-Befehl, der mit Namespaces arbeitet (`-n`), funktioniert genauso mit Projects.
 
 ### Routes vs. Ingress
 

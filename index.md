@@ -14,6 +14,7 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 * [Was ist Kubernetes?](docs/kubernetes.html) — Kernkonzepte und Abgrenzung zu Docker
 * [Kubernetes-Ressourcen](docs/kubernetes-resources.html) — Pods, Deployments, Services, ConfigMaps, Probes und mehr
 * [Was ist OpenShift?](docs/openshift.html) — Unterschiede zu Kubernetes, Sicherheit, Installationsoptionen
+* [kubectl/oc Cheat Sheet](docs/cli-cheatsheet.html) — Die wichtigsten CLI-Befehle für Kubernetes und OpenShift
 
 ## Container-Images
 

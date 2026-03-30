@@ -72,6 +72,18 @@ Ein Kubernetes-Cluster besteht aus:
 
 **Pod** — die kleinste bereitstellbare Einheit. Ein Pod enthält einen oder mehrere Container, die sich einen Netzwerk-Namespace teilen und über `localhost` kommunizieren können. Pods werden nicht direkt erstellt, sondern über Deployments verwaltet.
 
+### CLI: kubectl
+
+Die Interaktion mit einem Kubernetes-Cluster erfolgt über das Kommandozeilen-Tool **kubectl**. Damit werden Ressourcen erstellt, angezeigt, bearbeitet und gelöscht. Alle Befehle gehen über den API Server.
+
+```bash
+kubectl get pods
+kubectl apply -f deployment.yaml
+kubectl logs <pod-name>
+```
+
+Eine Übersicht der wichtigsten Befehle findest Du im [kubectl/oc Cheat Sheet](cli-cheatsheet.html).
+
 ### Ressourcen
 
 Kubernetes verwaltet Anwendungen über deklarative Ressourcen wie Pods, Deployments, Services, ConfigMaps und mehr. Eine ausführliche Übersicht findest Du unter [Kubernetes-Ressourcen](kubernetes-resources.html).

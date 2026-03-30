@@ -113,7 +113,21 @@ Definiert verschiedene Speichertypen (z.B. SSD, HDD, NFS) und ermöglicht **dyna
 
 ### Namespace
 
-Logische Isolation innerhalb eines Clusters. Ermöglicht die Trennung von Teams, Projekten oder Umgebungen (z.B. `dev`, `staging`, `prod`).
+Ein Namespace ist eine **logische Isolation** innerhalb eines Clusters. Er ermöglicht die Trennung von Teams, Projekten oder Umgebungen (z.B. `dev`, `staging`, `prod`). Die meisten Kubernetes-Ressourcen (Pods, Services, ConfigMaps, Secrets etc.) gehören zu genau einem Namespace. Namespaces ermöglichen:
+
+- **Organisatorische Trennung** — verschiedene Teams arbeiten im selben Cluster, ohne sich gegenseitig zu beeinflussen
+- **Zugriffskontrolle** — über RBAC können Berechtigungen pro Namespace vergeben werden
+- **Resource Quotas** — Begrenzung von CPU, Speicher und Anzahl der Ressourcen pro Namespace
+
+Jeder Cluster hat standardmäßig die Namespaces `default`, `kube-system` und `kube-public`.
+
+```bash
+# Namespace erstellen
+kubectl create namespace mein-projekt
+
+# Ressourcen in einem Namespace anzeigen
+kubectl get pods -n mein-projekt
+```
 
 ### ServiceAccount
 
