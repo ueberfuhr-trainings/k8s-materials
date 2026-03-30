@@ -25,19 +25,17 @@ Als Entwickler möchte ich die Backend-URL für das Frontend in einer ConfigMap 
 
 ### 1. ConfigMap erstellen
 
-Erstelle eine Datei `frontend-config.yaml`:
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: frontend-config
-data:
-  API_BASE_URL: "https://<deine-backend-route-url>"
-```
+Erstelle die ConfigMap direkt per CLI:
 
 ```bash
-oc apply -f frontend-config.yaml
+oc create configmap frontend-config \
+  --from-literal=API_BASE_URL="https://<deine-backend-route-url>"
+```
+
+Prüfe das Ergebnis:
+
+```bash
+oc get configmap frontend-config -o yaml
 ```
 
 ### 2. Frontend-Deployment anpassen
@@ -77,5 +75,4 @@ oc rollout restart deployment/recipes-frontend
 
 * Was ist der Vorteil einer ConfigMap gegenüber hart kodierten Umgebungsvariablen im Deployment?
 * Wann wird eine Änderung an einer ConfigMap wirksam? Muss der Pod neu gestartet werden?
-* Könnte man die gesamte Konfiguration (alle Umgebungsvariablen) über `envFrom` einbinden? Was wären Vor- und Nachteile?
-* Für welche Art von Daten ist eine ConfigMap geeignet — und für welche nicht? (Stichwort: Passwörter)
+* Für welche Art von Daten ist eine ConfigMap geeignet — und für welche nicht?
