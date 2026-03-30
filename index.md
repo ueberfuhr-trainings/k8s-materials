@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Startseite
+title: Kubernetes/OpenShift - Schulungsunterlagen
 ---
 
-# Kubernetes/OpenShift - Übungen
+# Kubernetes/OpenShift
 
 Willkommen zu den Übungen für den Kurs **Kubernetes/OpenShift**!
 
