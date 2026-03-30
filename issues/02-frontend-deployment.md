@@ -52,4 +52,3 @@ Wende das geänderte Manifest an und prüfe im Browser, ob das Frontend jetzt ko
 * Warum verwendet das Frontend eine Umgebungsvariable statt einer fest kodierten URL?
 * Was passiert, wenn die Backend-Route sich ändert — wo musst Du die URL aktualisieren?
 * Könnte das Frontend auch den internen Service-Namen (`http://recipes-backend:8080`) statt der Route-URL verwenden? Warum oder warum nicht?
-* Welche Nachteile hat es, die Backend-URL direkt im Deployment-YAML hart zu kodieren?
