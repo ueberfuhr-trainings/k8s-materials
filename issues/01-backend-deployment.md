@@ -152,7 +152,7 @@ curl -s https://<route-url>/recipes | jq
 * [Kubernetes Deployment-Dokumentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 * [Kubernetes Service-Dokumentation](https://kubernetes.io/docs/concepts/services-networking/service/)
 * [OpenShift Routes](https://docs.openshift.com/container-platform/latest/networking/routes/route-configuration.html)
-* [YAML-Syntax-Referenz](https://kubernetes.io/docs/reference/kubernetes-api/)
+* [YAML-Syntax-Referenz](https://kubernetes.io/docs/reference/kubernetes-api/) (z.B. zu [`Deployment`](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/))
 * [Recipes-Backend Docker Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-backend) — Dokumentation der Umgebungsvariablen und Ports
 
 ## 🤔 Reflexionsfragen
@@ -162,3 +162,4 @@ curl -s https://<route-url>/recipes | jq
 * Warum braucht man einen Service, obwohl der Pod schon läuft? Was passiert, wenn der Pod neu gestartet wird?
 * Welche Rolle spielt die Route in OpenShift? Wie unterscheidet sich das von einem Kubernetes Ingress?
 * Was passiert mit den Daten in der H2-Datenbank, wenn der Pod neu gestartet wird?
+* Was ist die `imagePullPolicy` und welcher Wert gilt standardmäßig? Welche anderen Werte gibt es, und wann ist welcher sinnvoll? Was passiert, wenn Du das `latest`-Tag verwendest — wird das Image bei jedem Pod-Start neu gezogen?

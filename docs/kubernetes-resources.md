@@ -139,15 +139,9 @@ Identität für Pods, um sich gegenüber der Kubernetes-API oder externen Dienst
 
 ## Health Checks (Probes)
 
-Kubernetes überwacht Container mit drei Arten von Probes:
+Kubernetes überwacht Container mit **Startup-, Liveness- und Readiness-Probes**, um fehlerhafte Container automatisch neu zu starten und nur bereite Container mit Traffic zu versorgen. Probes werden pro Container konfiguriert, nicht pro Pod.
 
-| Probe | Beschreibung | Bei Fehlschlag |
-|-------|-------------|----------------|
-| **Liveness Probe** | Prüft, ob der Container lebt | Pod wird neu gestartet |
-| **Readiness Probe** | Prüft, ob der Container bereit ist, Traffic zu empfangen | Pod wird aus dem Service entfernt |
-| **Startup Probe** | Prüft, ob der Container gestartet ist | Liveness/Readiness werden erst danach aktiv |
-
-Probe-Mechanismen: `httpGet`, `tcpSocket`, `exec` (Kommando im Container).
+Eine ausführliche Erklärung der drei Probe-Typen, ihrer Konfiguration und Beispiele für verschiedene Anwendungstypen findest Du unter [Health Checks (Probes)](probes.html).
 
 ## Übersicht
 

@@ -95,6 +95,8 @@ oc apply -f postgres-init-sql.yaml
 
 ### 4. PostgreSQL-Deployment erstellen
 
+> **Hinweis:** Wir verwenden hier der Einfachheit halber ein Deployment ohne Persistent Volume. Für produktive Szenarien wäre ein **StatefulSet** mit PersistentVolumeClaim die richtige Wahl — siehe [PostgreSQL auf Kubernetes – Best Practices](../docs/postgres-as-statefulset.html).
+
 Erstelle eine Datei `postgres-deployment.yaml`. Das offizielle PostgreSQL-Image führt automatisch alle `.sql`-Dateien im Verzeichnis `/docker-entrypoint-initdb.d/` beim ersten Start aus.
 
 ```yaml
@@ -171,6 +173,7 @@ In den Logs sollte die Ausführung des Init-Skripts sichtbar sein.
 * [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/)
 * [ConfigMap als Volume einbinden](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume)
 * [PostgreSQL Docker Image](https://hub.docker.com/_/postgres) — Dokumentation der Umgebungsvariablen und Init-Skripte
+* [PostgreSQL auf Kubernetes – Best Practices](../docs/postgres-as-statefulset.html) — StatefulSet, Operatoren und produktionsreife Setups
 
 ## 🤔 Reflexionsfragen
 
@@ -179,3 +182,4 @@ In den Logs sollte die Ausführung des Init-Skripts sichtbar sein.
 * Warum wird das Init-SQL über eine ConfigMap und ein Volume eingebunden, statt es direkt ins Image zu backen?
 * Was passiert, wenn das Init-SQL erneut ausgeführt wird (z.B. nach einem Pod-Neustart)? Wie verhält sich PostgreSQL, wenn die Tabellen bereits existieren?
 * Was ist der Unterschied zwischen `envFrom: secretRef` und einzelnen `env`-Einträgen mit `valueFrom: secretKeyRef`?
+* Inwiefern ist unser PostgreSQL-Setup in dieser Übung nicht produktionsreif? Welche Probleme können auftreten, und welche Kubernetes-Ressourcen oder Werkzeuge (StatefulSet, PVC, Operator) würden diese lösen?

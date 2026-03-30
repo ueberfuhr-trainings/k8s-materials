@@ -15,6 +15,8 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 * [Kubernetes-Ressourcen](docs/kubernetes-resources.html) — Pods, Deployments, Services, ConfigMaps, Probes und mehr
 * [Was ist OpenShift?](docs/openshift.html) — Unterschiede zu Kubernetes, Sicherheit, Installationsoptionen
 * [kubectl/oc Cheat Sheet](docs/cli-cheatsheet.html) — Die wichtigsten CLI-Befehle für Kubernetes und OpenShift
+* [Health Checks (Probes)](docs/probes.html) — Startup, Liveness und Readiness Probes mit Beispielen
+* [PostgreSQL auf Kubernetes – Best Practices](docs/postgres-as-statefulset.html) — StatefulSet, Operatoren und produktionsreife Setups
 
 ## Container-Images
 
