@@ -9,11 +9,17 @@ Willkommen zu den Übungen für den Kurs **Kubernetes/OpenShift**!
 
 In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung bestehend aus einem Backend und einem Frontend in OpenShift.
 
+## Dokumentation
+
+* [Was ist Kubernetes?](docs/kubernetes.html) — Kernkonzepte und Abgrenzung zu Docker
+* [Kubernetes-Ressourcen](docs/kubernetes-resources.html) — Pods, Deployments, Services, ConfigMaps, Probes und mehr
+* [Was ist OpenShift?](docs/openshift.html) — Unterschiede zu Kubernetes, Sicherheit, Installationsoptionen
+
 ## Container-Images
 
-| Image | Docker Hub | Beschreibung |
-|-------|-----------|-------------|
-| `ralfueberfuhr/recipes-backend` | [Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-backend) | REST-Backend (Quarkus) |
+| Image                            | Docker Hub                                                     | Beschreibung                 |
+|----------------------------------|----------------------------------------------------------------|------------------------------|
+| `ralfueberfuhr/recipes-backend`  | [Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-backend)  | REST-Backend (Quarkus)       |
 | `ralfueberfuhr/recipes-frontend` | [Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-frontend) | Web-Frontend (Angular/NGINX) |
 
 ## Übungen
