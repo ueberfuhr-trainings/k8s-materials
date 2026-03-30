@@ -9,6 +9,10 @@ Willkommen zu den Übungen für den Kurs **Kubernetes/OpenShift**!
 
 In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung bestehend aus einem Backend und einem Frontend in OpenShift.
 
+## Zum Einstieg
+
+* [Docker Grundlagen-Check](reflections/docker-grundlagen.html) — Quiz zur Auffrischung der Container-Basics
+
 ## Dokumentation
 
 * [Was ist Kubernetes?](docs/kubernetes.html) — Kernkonzepte und Abgrenzung zu Docker
