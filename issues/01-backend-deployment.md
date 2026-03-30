@@ -16,6 +16,7 @@ Als Entwickler möchte ich das Recipes-Backend als Container in OpenShift deploy
 ## ✅ Definition of Done
 
 * [ ] Du hast ein Deployment für das Backend erstellt und angewendet.
+* [ ] Du hast den `ErrImagePull`-Fehler analysiert und ein Pull Secret erstellt.
 * [ ] Du hast die Fehlermeldung beim `latest`-Tag analysiert und verstanden.
 * [ ] Du hast das Image-Tag auf `latest-dev` geändert und der Pod läuft erfolgreich.
 * [ ] Du hast einen Service und eine Route erstellt.
@@ -23,18 +24,7 @@ Als Entwickler möchte ich das Recipes-Backend als Container in OpenShift deploy
 
 ## 🪜 Arbeitsschritte
 
-### 1. Pull Secret erstellen
-
-Da die Container-Images von Docker Hub gezogen werden, benötigst Du ein Pull Secret mit Deinen Docker Hub-Zugangsdaten:
-
-```bash
-oc create secret docker-registry dockerhub-pull-secret \
-  --docker-server=docker.io \
-  --docker-username=<dein-dockerhub-username> \
-  --docker-password=<dein-dockerhub-token>
-```
-
-### 2. Deployment erstellen
+### 1. Deployment erstellen
 
 Erstelle eine Datei `backend-deployment.yaml` mit folgendem Inhalt:
 
@@ -53,8 +43,6 @@ spec:
       labels:
         app: recipes-backend
     spec:
-      imagePullSecrets:
-        - name: dockerhub-pull-secret
       containers:
         - name: recipes-backend
           image: ralfueberfuhr/recipes-backend:latest
@@ -68,9 +56,47 @@ Wende das Manifest an:
 oc apply -f backend-deployment.yaml
 ```
 
-### 3. Fehler analysieren
+### 2. Fehler analysieren — Image Pull
 
-Der Pod wird in einen Fehlerzustand laufen, weil das `latest`-Tag eine PostgreSQL-Datenbank erwartet. Untersuche den Fehler:
+Prüfe den Status des Pods:
+
+```bash
+oc get pods
+oc describe pod <pod-name>
+```
+
+Du wirst einen `ErrImagePull`- oder `ImagePullBackOff`-Status sehen. Docker Hub limitiert anonyme Zugriffe (Rate Limiting). Wir brauchen ein **Pull Secret** mit Docker Hub-Zugangsdaten.
+
+### 3. Pull Secret erstellen und Deployment ergänzen
+
+Erstelle ein Pull Secret:
+
+```bash
+oc create secret docker-registry dockerhub-pull-secret \
+  --docker-server=docker.io \
+  --docker-username=<dein-dockerhub-username> \
+  --docker-password=<dein-dockerhub-token>
+```
+
+Ergänze im `backend-deployment.yaml` den Abschnitt `imagePullSecrets` im `spec`-Block des Pod-Templates:
+
+```yaml
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
+      containers:
+        - name: recipes-backend
+```
+
+Wende das geänderte Manifest erneut an:
+
+```bash
+oc apply -f backend-deployment.yaml
+```
+
+### 4. Fehler analysieren — Datenbank
+
+Der Pod wird nun das Image ziehen können, aber in einen neuen Fehlerzustand laufen, weil das `latest`-Tag eine PostgreSQL-Datenbank erwartet:
 
 ```bash
 oc get pods
@@ -80,7 +106,7 @@ oc logs <pod-name>
 
 Du solltest eine Fehlermeldung sehen, die auf eine fehlende Datenbankkonfiguration hinweist.
 
-### 4. Auf `latest-dev` wechseln
+### 5. Auf `latest-dev` wechseln
 
 Ändere in deinem YAML das Image-Tag von `latest` auf `latest-dev`. Dieses Tag enthält eine eingebaute H2 InMemory-Datenbank und benötigt keine externe Datenbank.
 
@@ -96,7 +122,7 @@ oc get pods
 oc logs <pod-name>
 ```
 
-### 5. Service erstellen
+### 6. Service erstellen
 
 Erstelle eine Datei `backend-service.yaml`:
 
@@ -117,7 +143,7 @@ spec:
 oc apply -f backend-service.yaml
 ```
 
-### 6. Route erstellen
+### 7. Route erstellen
 
 Erstelle eine Datei `backend-route.yaml`:
 
