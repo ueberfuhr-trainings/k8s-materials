@@ -52,21 +52,25 @@ Ein Kubernetes-Cluster besteht aus:
 └──────────────────────────────────────────────────────┘
 ```
 
-**Control Plane-Komponenten:**
+#### Control Plane-Komponenten
 
-| Komponente | Aufgabe |
-|------------|---------|
-| **API Server** | Zentrale Schnittstelle — alle Befehle (`kubectl`, `oc`) gehen hierüber |
-| **Scheduler** | Entscheidet, auf welchem Knoten ein neuer Pod läuft |
-| **Controller Manager** | Überwacht den Ist-Zustand und stellt den Soll-Zustand her (z.B. Replica-Anzahl) |
-| **etcd** | Verteilter Key-Value-Store — speichert den gesamten Cluster-Zustand |
+**API Server** — die zentrale Schnittstelle des Clusters. Jede Interaktion — ob über `kubectl`, `oc`, die Web-Konsole oder andere Komponenten — läuft über den API Server. Er validiert und verarbeitet Anfragen und schreibt den gewünschten Zustand in etcd.
 
-**Worker-Node-Komponenten:**
+**etcd** (von `/etc` + *distributed* — ein „verteiltes Konfigurationsverzeichnis") — ein verteilter Key-Value-Store, der den **gesamten Cluster-Zustand** persistent speichert (Deployments, Pods, ConfigMaps, Secrets etc.). Nur der API Server greift direkt auf etcd zu. Fällt etcd aus, ist der Cluster effektiv blind.
 
-| Komponente | Aufgabe |
-|------------|---------|
-| **kubelet** | Agent auf jedem Knoten — startet und überwacht Pods |
-| **kube-proxy** | Netzwerk-Proxy — leitet Traffic an die richtigen Pods weiter |
+**Scheduler** — beobachtet neu erstellte Pods, die noch keinem Knoten zugewiesen sind, und entscheidet anhand von Ressourcen, Constraints und Affinitätsregeln, auf welchem Worker Node ein Pod platziert wird.
+
+**Controller Manager** — führt eine Sammlung von Controllern aus, die kontinuierlich den **Ist-Zustand** des Clusters mit dem **Soll-Zustand** abgleichen. Beispiele: der ReplicaSet-Controller stellt sicher, dass die gewünschte Pod-Anzahl läuft; der Node-Controller erkennt ausgefallene Knoten.
+
+#### Worker-Node-Komponenten
+
+**kubelet** — der **Node-Agent**, also der Prozess, über den sich ein Knoten steuern lässt. Der kubelet läuft auf jedem Worker Node und ist dafür verantwortlich, die vom Scheduler zugewiesenen Pods tatsächlich zu starten, zu überwachen und bei Bedarf neu zu starten. Er kommuniziert mit dem API Server, meldet den Zustand des Knotens und seiner Pods und steuert die Container-Runtime.
+
+**kube-proxy** — der Netzwerk-Proxy auf jedem Knoten. Er setzt die Kubernetes-Service-Abstraktion um, indem er Netzwerkregeln (iptables/IPVS) verwaltet, die eingehenden Traffic an die richtigen Pods weiterleiten — auch über Knoten-Grenzen hinweg.
+
+**Container-Runtime** — die Software, die Container tatsächlich startet und ausführt. Kubernetes unterstützt jede Runtime, die das **Container Runtime Interface (CRI)** implementiert, z.B. **containerd** oder **CRI-O** (von OpenShift verwendet).
+
+**Pod** — die kleinste bereitstellbare Einheit. Ein Pod enthält einen oder mehrere Container, die sich einen Netzwerk-Namespace teilen und über `localhost` kommunizieren können. Pods werden nicht direkt erstellt, sondern über Deployments verwaltet.
 
 ### Ressourcen
 

@@ -18,6 +18,23 @@ Die kleinste bereitstellbare Einheit in Kubernetes — ein oder mehrere Containe
 
 Pods ermöglichen Muster wie das **Sidecar-Pattern**, bei dem ein Hilfs-Container (z.B. für Logging oder Proxying) neben dem Hauptcontainer läuft.
 
+![Aufbau eines Pods](img/pod.png)
+
+Der Pod ist auch die Einheit für **Lifecycle** und **Skalierung**: Kubernetes startet, stoppt und überwacht Pods als Ganzes. Soll eine Anwendung skaliert werden, werden zusätzliche Pod-Replicas erzeugt — nicht einzelne Container innerhalb eines Pods. Ebenso werden bei einem Rolling Update ganze Pods durch neue ersetzt.
+
+Neben dem eigentlichen **App-Container** kann ein Pod weitere Container enthalten:
+
+- **Init-Container** — laufen **vor** dem App-Container und müssen erfolgreich abschließen, bevor die Anwendung startet. Geeignet für Vorbereitungsaufgaben.
+- **Sidecar-Container** — laufen **parallel** zum App-Container für die gesamte Lebensdauer des Pods. Geeignet für Querschnittsaufgaben.
+
+| Szenario | App-Container | Init-Container | Sidecar-Container |
+|----------|--------------|----------------|-------------------|
+| **Web-App mit DB-Migration und Logging** | Anwendungsserver (z.B. Quarkus) | Führt vor dem App-Start Datenbankmigrationen aus (z.B. Liquibase, Flyway) — so ist das Schema garantiert aktuell, bevor die Anwendung startet | Log-Collector (z.B. Fluentd), der Logdateien aus einem gemeinsamen Volume ausliest und weiterleitet |
+| **Transactional Outbox Pattern** | Microservice, der Geschäftslogik ausführt und Events in eine Outbox-Tabelle schreibt (in derselben DB-Transaktion) | — | Einfacher Poller, der regelmäßig die Outbox-Tabelle abfragt und Events an Kafka sendet (Alternative: Debezium mit CDC als eigenes Deployment) |
+| **App mit TLS-Proxy** | Backend-Anwendung (nur HTTP) | Lädt Zertifikate aus einem Secret und legt sie im gemeinsamen Volume ab | Envoy/NGINX als Reverse Proxy, der TLS terminiert und Traffic an den App-Container weiterleitet |
+
+Mehr dazu in der [Kubernetes-Dokumentation zu Pods](https://kubernetes.io/docs/concepts/workloads/pods/).
+
 > In der Praxis erstellt man Pods nicht direkt, sondern über Deployments, die den gewünschten Zustand verwalten.
 
 ### Deployment
@@ -135,3 +152,4 @@ Probe-Mechanismen: `httpGet`, `tcpSocket`, `exec` (Kommando im Container).
 * [Kubernetes Networking](https://kubernetes.io/docs/concepts/services-networking/)
 * [Kubernetes Storage](https://kubernetes.io/docs/concepts/storage/)
 * [Kubernetes RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+* [Kubernetes-Ressourcen im Überblick](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-resources/)
