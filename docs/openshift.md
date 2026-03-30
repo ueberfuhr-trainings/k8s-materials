@@ -67,8 +67,8 @@ OpenShift kann auf verschiedene Arten installiert werden:
 
 | Service | Cloud-Anbieter |
 |---------|---------------|
-| **ROSA** (Red Hat OpenShift on AWS) | Amazon Web Services |
-| **ARO** (Azure Red Hat OpenShift) | Microsoft Azure |
+| [**ROSA** (Red Hat OpenShift on AWS)](https://aws.amazon.com/rosa/) | Amazon Web Services |
+| [**ARO** (Azure Red Hat OpenShift)](https://azure.microsoft.com/en-us/products/openshift) | Microsoft Azure |
 | **RHOIC** (Red Hat OpenShift on IBM Cloud) | IBM Cloud |
 
 Vorteile: Kein eigener Betrieb, automatische Updates, SLA-gesichert.
@@ -104,7 +104,7 @@ oc login -u developer https://api.crc.testing:6443
 
 ## Weiterführende Links
 
-* [Red Hat OpenShift Dokumentation](https://docs.openshift.com/)
+* [Red Hat OpenShift Dokumentation](https://docs.redhat.com/en/documentation/openshift_container_platform/)
+* [Red Hat OpenShift — Produktseite](https://www.redhat.com/en/technologies/cloud-computing/openshift)
 * [OpenShift Local herunterladen](https://developers.redhat.com/products/openshift-local/overview)
-* [OpenShift vs. Kubernetes (Red Hat)](https://www.redhat.com/en/topics/containers/what-is-openshift)
 * [OperatorHub.io](https://operatorhub.io/)
