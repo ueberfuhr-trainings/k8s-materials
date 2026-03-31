@@ -178,8 +178,6 @@ In den Logs sollte die Ausführung des Init-Skripts sichtbar sein.
 ## 🤔 Reflexionsfragen
 
 * Warum werden Zugangsdaten in einem Secret statt in einer ConfigMap gespeichert? Wie sicher ist ein Kubernetes-Secret wirklich?
-* Was passiert mit den Daten in der PostgreSQL-Datenbank, wenn der Pod neu gestartet wird? Wie könnte man das verhindern? (Stichwort: PersistentVolumeClaim)
-* Warum wird das Init-SQL über eine ConfigMap und ein Volume eingebunden, statt es direkt ins Image zu backen?
-* Was passiert, wenn das Init-SQL erneut ausgeführt wird (z.B. nach einem Pod-Neustart)? Wie verhält sich PostgreSQL, wenn die Tabellen bereits existieren?
+* Warum wird das Init-SQL über eine ConfigMap und ein Volume eingebunden, statt es direkt ins Image zu packen?
 * Was ist der Unterschied zwischen `envFrom: secretRef` und einzelnen `env`-Einträgen mit `valueFrom: secretKeyRef`?
-* Inwiefern ist unser PostgreSQL-Setup in dieser Übung nicht produktionsreif? Welche Probleme können auftreten, und welche Kubernetes-Ressourcen oder Werkzeuge (StatefulSet, PVC, Operator) würden diese lösen?
+* Inwiefern ist unser PostgreSQL-Setup in dieser Übung nicht produktionsreif?

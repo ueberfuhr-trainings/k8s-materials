@@ -12,7 +12,6 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 * Du kannst ein bestehendes Deployment auf ein anderes Image-Tag umstellen.
 * Du kannst Umgebungsvariablen aus verschiedenen Quellen (Secrets, ConfigMaps, statische Werte) kombinieren.
 * Du verstehst, wie Services als interne DNS-Namen für die Kommunikation zwischen Pods genutzt werden.
-* Du verstehst den Zusammenhang zwischen Image-Tags und Laufzeitkonfiguration.
 
 ## ✅ Definition of Done
 
@@ -29,7 +28,7 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 Ändere im Backend-Deployment das Image-Tag von `latest-dev` zurück auf `latest`:
 
 ```yaml
-          image: ralfueberfuhr/recipes-backend:latest
+image: ralfueberfuhr/recipes-backend:latest
 ```
 
 ### 2. Umgebungsvariablen konfigurieren
@@ -90,8 +89,5 @@ curl -s https://<backend-route>/recipes | jq
 
 ## 🤔 Reflexionsfragen
 
-* Warum kann das Backend den Service-Namen `postgres` als Hostname verwenden? Wie funktioniert die DNS-Auflösung innerhalb eines Kubernetes-Clusters?
-* Warum ist es wichtig, `DB_USER` und `DB_PASSWORD` aus dem Secret zu beziehen, statt sie direkt im YAML zu schreiben?
-* Was passiert, wenn der PostgreSQL-Pod neu gestartet wird? Bleiben die Daten erhalten? Wie könnte man das absichern?
-* Welche Rolle spielen die Health-Check-Endpunkte (`/q/health/ready`) in diesem Szenario? Was passiert, wenn das Backend startet, bevor die Datenbank bereit ist?
-* Könntest Du die gesamte Datenbank-Konfiguration (`DB_URL`, `DB_USER`, `DB_PASSWORD`) in eine einzige ConfigMap/Secret auslagern? Was wären die Vor- und Nachteile?
+* Brauchen wir für die Datenbank eine Route?
+* Ist es sinnvoll, die `DB_URL` auch im  `postgres-secret` bereitzustellen?
