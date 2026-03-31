@@ -119,6 +119,9 @@ spec:
           image: postgres:17-alpine
           ports:
             - containerPort: 5432
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           envFrom:
             - secretRef:
                 name: postgres-secret
@@ -127,10 +130,15 @@ spec:
           volumeMounts:
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
+            - name: data
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
       volumes:
         - name: init-sql
           configMap:
             name: postgres-init-sql
+        - name: data
+          emptyDir: {}
 ```
 
 ```bash
