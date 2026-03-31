@@ -117,6 +117,7 @@ database:
 
 In `recipes-db/templates/deployment.yaml` ersetzt du dann z.B.:
 
+{% raw %}
 ```yaml
 # Vorher:
 image: postgres:17-alpine
@@ -124,9 +125,11 @@ image: postgres:17-alpine
 # Nachher:
 image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
 ```
+{% endraw %}
 
 Und in `recipes-db/templates/secret.yaml`:
 
+{% raw %}
 ```yaml
 # Vorher:
 data:
@@ -138,6 +141,7 @@ stringData:
   POSTGRES_USER: {{ .Values.database.user }}
   POSTGRES_PASSWORD: {{ .Values.database.password }}
 ```
+{% endraw %}
 
 Nach jeder Änderung erneut prüfen:
 

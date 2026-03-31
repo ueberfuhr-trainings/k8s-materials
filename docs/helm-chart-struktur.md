@@ -70,7 +70,7 @@ service:
   port: 8080
 ```
 
-In Templates werden diese Werte mit `{{ .Values.image.tag }}` referenziert.
+In Templates werden diese Werte mit {% raw %}`{{ .Values.image.tag }}`{% endraw %} referenziert.
 
 ### values.schema.json
 
@@ -103,6 +103,7 @@ Kubernetes-Manifeste als Go-Templates. Jede `.yaml`-Datei in diesem Verzeichnis 
 
 Text, der nach `helm install` und `helm upgrade` auf der Konsole angezeigt wird. Unterstützt Go-Templating und wird typischerweise genutzt, um dem Nutzer die nächsten Schritte zu zeigen:
 
+{% raw %}
 ```
 Dein Release {{ .Release.Name }} wurde installiert!
 
@@ -110,11 +111,13 @@ So erreichst du die Anwendung:
   export URL=$(kubectl get route {{ .Release.Name }} -o jsonpath='{.spec.host}')
   echo "Öffne https://$URL"
 ```
+{% endraw %}
 
 #### templates/_helpers.tpl
 
-Dateien mit Unterstrich (`_`) erzeugen kein Kubernetes-Manifest. Sie enthalten wiederverwendbare Template-Funktionen, die von anderen Templates mit `{{ include }}` aufgerufen werden:
+Dateien mit Unterstrich (`_`) erzeugen kein Kubernetes-Manifest. Sie enthalten wiederverwendbare Template-Funktionen, die von anderen Templates mit {% raw %}`{{ include }}`{% endraw %} aufgerufen werden:
 
+{% raw %}
 ```
 {{- define "my-app.fullname" -}}
 {{ .Release.Name }}-{{ .Chart.Name }}
@@ -126,20 +129,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion }}
 {{- end -}}
 ```
+{% endraw %}
 
 Verwendung in einem Template:
 
+{% raw %}
 ```yaml
 metadata:
   name: {{ include "my-app.fullname" . }}
   labels:
     {{- include "my-app.labels" . | nindent 4 }}
 ```
+{% endraw %}
 
 #### templates/tests/
 
 Pods mit der Annotation `helm.sh/hook: test`, die nach der Installation mit `helm test my-release` ausgeführt werden:
 
+{% raw %}
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -154,6 +161,7 @@ spec:
       command: ['curl', '--fail', 'http://{{ .Release.Name }}:8080/health']
   restartPolicy: Never
 ```
+{% endraw %}
 
 Typische Einsätze: HTTP-Anfrage an den Service, Datenbankverbindung prüfen, Smoke-Test.
 

@@ -74,6 +74,7 @@ image:
 replicas: 1
 ```
 
+{% raw %}
 ```yaml
 # templates/deployment.yaml (Auszug)
 spec:
@@ -84,6 +85,7 @@ spec:
         - name: backend
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
 ```
+{% endraw %}
 
 Beim Installieren können Werte überschrieben werden:
 
@@ -184,7 +186,7 @@ Helm-Templates können OpenShift-spezifische Ressourcen (Routes, SecurityContext
 
 ## Herausforderungen
 
-- **Lernkurve:** Go-Templating (`{{ if }}`, `{{ range }}`, `{{ include }}`) ist mächtig, aber die Syntax gewöhnungsbedürftig — besonders bei verschachtelten Templates und Whitespace-Kontrolle.
+- **Lernkurve:** Go-Templating ({% raw %}`{{ if }}`{% endraw %}, {% raw %}`{{ range }}`{% endraw %}, {% raw %}`{{ include }}`{% endraw %}) ist mächtig, aber die Syntax gewöhnungsbedürftig — besonders bei verschachtelten Templates und Whitespace-Kontrolle.
 - **Debugging:** Fehler in Templates erzeugen oft kryptische Fehlermeldungen. `helm template` und `helm lint` helfen, aber die Fehlersuche bleibt aufwändiger als bei purem YAML.
 - **Komplexität bei großen Charts:** Umbrella-Charts mit vielen Subcharts können schwer überschaubar werden. Values-Overrides über mehrere Ebenen sind fehleranfällig.
 - **Kein GitOps out of the box:** Helm verwaltet Releases imperativ (`helm install`, `helm upgrade`). Für GitOps-Workflows braucht man zusätzliche Tools (ArgoCD, Flux), die Helm-Charts deklarativ aus Git deployen.
