@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes &amp; OpenShift Wissens-Check - ATVANTAGE Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #111111;
+      color: #eeeeee;
+    }
+
+    .academy-header {
+      background-color: #1e1e1e;
+      border-bottom: 3px solid #ff5401;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .quiz-card {
+      background-color: #1e1e1e;
+      border: 1px solid #333333;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn {
+      background-color: #2a2a2a;
+      border: 2px solid #333333;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: #333333;
+      border-color: #444444;
+    }
+
+    .option-btn.correct {
+      background-color: #14532d;
+      border-color: #22c55e;
+    }
+
+    .option-btn.wrong {
+      background-color: #431407;
+      border-color: #ff5401;
+    }
+
+    .code-block {
+      background-color: #000000;
+      font-family: 'Courier New', Courier, monospace;
+      border: 1px solid #333333;
+    }
+
+    .email-hover-bridge::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Academy Top Bar -->
+<nav class="academy-header sticky top-0 z-40 w-full px-6 h-16 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <span class="text-xl font-black tracking-tighter text-[#ff5401]">ATVANTAGE</span>
+    <span class="text-xl font-light text-neutral-500">Academy</span>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="relative group">
+      <button id="email-btn" class="p-2 text-neutral-400 hover:text-[#ff5401] transition-colors"
+              title="E-Mail Kontakt">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </button>
+      <div class="absolute right-0 top-10 hidden group-hover:flex items-center gap-3 bg-[#2a2a2a] border border-[#333333] p-2 px-3 rounded-lg shadow-2xl z-50 email-hover-bridge">
+        <a id="email-link-display" href="#"
+           class="text-sm font-medium text-slate-300 hover:text-[#ff5401] transition-colors underline decoration-dotted underline-offset-4 decoration-slate-600">academy@atvantage.com</a>
+        <button id="copy-email-sub-btn"
+                class="bg-[#ff5401] hover:bg-[#e64a00] p-1.5 rounded transition-colors text-[#111111]"
+                title="Kopieren">
+          <svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+          </svg>
+          <svg id="check-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="w-full min-h-screen flex items-center justify-center p-4 md:p-8">
+
+<div id="quiz-container" class="w-full max-w-2xl">
+  <!-- Header -->
+  <div class="mb-8 text-center">
+    <h1 class="text-4xl font-extrabold text-white mb-2 tracking-tight">Kubernetes &amp; OpenShift <span class="text-[#ff5401]">Wissens-Check</span></h1>
+    <p class="text-neutral-500">Wiederholung Tag 1</p>
+    <div class="mt-4 flex justify-between items-center text-xs text-neutral-500 mb-1">
+      <span id="question-counter">Frage 1 von 15</span>
+      <span id="score-counter">Punkte: 0</span>
+    </div>
+    <div class="h-2 w-full bg-[#1e1e1e] rounded-full overflow-hidden border border-[#333333]">
+      <div id="progress-bar" class="h-full bg-[#ff5401] transition-all duration-500" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- Question Card -->
+  <div id="question-card" class="quiz-card p-6 rounded-2xl shadow-2xl">
+    <div id="question-content">
+    </div>
+
+    <div id="options-container" class="space-y-3 mt-6">
+    </div>
+
+    <div id="feedback" class="mt-6 p-4 rounded-lg hidden border-l-4">
+    </div>
+
+    <button id="next-btn"
+            class="mt-6 w-full py-3 bg-[#ff5401] hover:bg-[#e64a00] font-semibold rounded-xl transition-colors hidden text-white">
+      Nächste Frage
+    </button>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="quiz-card p-8 rounded-2xl shadow-2xl text-center hidden">
+    <h2 class="text-4xl font-extrabold text-white mb-4">Training <span class="text-[#ff5401]">beendet!</span></h2>
+    <p id="final-score" class="text-xl mb-6"></p>
+    <div id="score-interpretation" class="mb-8 text-neutral-400"></div>
+    <button onclick="location.reload()" class="px-8 py-3 bg-[#ff5401] hover:bg-[#e64a00] font-semibold rounded-xl text-white transition-colors">
+      Quiz neu starten
+    </button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  function getAcademyEmail() {
+    const part1 = 'academy';
+    const part2 = 'atvantage.com';
+    return part1 + '@' + part2;
+  }
+
+  // E-Mail Anzeige initialisieren
+  const emailLink = document.getElementById('email-link-display');
+  emailLink.innerText = getAcademyEmail();
+
+  // E-Mail Logik (Header Button)
+  document.getElementById('email-btn').onclick = function () {
+    window.location.href = 'mailto:' + getAcademyEmail();
+  };
+
+  // E-Mail Logik (Popup Link)
+  emailLink.onclick = function (e) {
+    e.preventDefault();
+    window.location.href = 'mailto:' + getAcademyEmail();
+  };
+  emailLink.onmouseenter = function () {
+    this.href = 'mailto:' + getAcademyEmail();
+  };
+
+  // E-Mail Kopieren
+  document.getElementById('copy-email-sub-btn').onclick = function () {
+    const email = getAcademyEmail();
+    const temp = document.createElement('textarea');
+    temp.value = email;
+    document.body.appendChild(temp);
+    temp.select();
+    try {
+      document.execCommand('copy');
+      const copyIcon = document.getElementById('copy-icon');
+      const checkIcon = document.getElementById('check-icon');
+      copyIcon.classList.add('hidden');
+      checkIcon.classList.remove('hidden');
+      setTimeout(() => {
+        copyIcon.classList.remove('hidden');
+        checkIcon.classList.add('hidden');
+      }, 2000);
+    } catch (err) {
+      console.error('Kopieren fehlgeschlagen');
+    }
+    document.body.removeChild(temp);
+  };
+
+  const questions = [
+    {
+      description: "OpenShift wird oft als 'Enterprise Kubernetes' bezeichnet.",
+      question: "Was ist das Verhältnis zwischen OpenShift und Kubernetes?",
+      options: [
+        {
+          text: "OpenShift ist eine Kubernetes-Distribution mit zusätzlichen Features wie Routes, Web Console und Security Context Constraints.",
+          correct: true,
+          feedback: "Richtig! OpenShift baut auf Kubernetes auf und erweitert es um Enterprise-Features. Alles, was in Kubernetes funktioniert, funktioniert auch in OpenShift."
+        },
+        {
+          text: "OpenShift ist eine komplett eigenständige Container-Plattform, die nichts mit Kubernetes zu tun hat.",
+          correct: false,
+          feedback: "Falsch. OpenShift basiert vollständig auf Kubernetes und erweitert es."
+        },
+        {
+          text: "Kubernetes ist eine Erweiterung von OpenShift.",
+          correct: false,
+          feedback: "Andersherum: OpenShift erweitert Kubernetes, nicht umgekehrt."
+        },
+        {
+          text: "OpenShift und Kubernetes sind zwei verschiedene Namen für dasselbe Produkt.",
+          correct: false,
+          feedback: "Nicht ganz. OpenShift enthält Kubernetes, bringt aber zusätzliche Funktionalität mit."
+        }
+      ]
+    },
+    {
+      description: "In Kubernetes und OpenShift gibt es verschiedene Wege, Ressourcen anzulegen.",
+      question: "Welche der folgenden Möglichkeiten existieren, um eine Ressource im Cluster zu erstellen?",
+      options: [
+        {
+          text: "Über die Web Console, mit oc create oder mit oc apply -f.",
+          correct: true,
+          feedback: "Richtig! Alle drei Wege führen zum Ziel. Die Web Console ist visuell, oc create und oc apply -f arbeiten mit der CLI."
+        },
+        {
+          text: "Nur über die Web Console, da Kubernetes grafisch bedient wird.",
+          correct: false,
+          feedback: "Die Web Console ist nur eine von mehreren Möglichkeiten. Im Alltag arbeitet man oft mit der CLI."
+        },
+        {
+          text: "Nur über YAML-Dateien, die man per E-Mail an den Cluster schickt.",
+          correct: false,
+          feedback: "YAML-Dateien sind wichtig, aber man übergibt sie mit oc apply -f an den Cluster."
+        },
+        {
+          text: "Ausschließlich mit oc create, da oc apply nur zum Lesen dient.",
+          correct: false,
+          feedback: "oc apply kann Ressourcen sowohl erstellen als auch aktualisieren."
+        }
+      ]
+    },
+    {
+      description: "Du hast ein Deployment bereits mit oc apply -f deployment.yaml angelegt. Nun möchtest du das Image-Tag ändern.",
+      question: "Was passiert, wenn du die YAML-Datei anpasst und erneut oc apply -f deployment.yaml ausführst?",
+      options: [
+        {
+          text: "Kubernetes erkennt die Änderung und aktualisiert das bestehende Deployment.",
+          correct: true,
+          feedback: "Richtig! oc apply vergleicht den gewünschten mit dem aktuellen Zustand und wendet nur die Unterschiede an."
+        },
+        {
+          text: "Es gibt einen Fehler, weil das Deployment schon existiert.",
+          correct: false,
+          feedback: "Das wäre bei oc create der Fall, nicht bei oc apply."
+        },
+        {
+          text: "Es wird ein zweites Deployment mit gleichem Namen erstellt.",
+          correct: false,
+          feedback: "Kubernetes erlaubt keine zwei Ressourcen gleichen Typs mit gleichem Namen im selben Namespace."
+        },
+        {
+          text: "Das bestehende Deployment wird gelöscht und komplett neu angelegt.",
+          correct: false,
+          feedback: "Nein, oc apply führt ein inkrementelles Update durch, kein Delete+Create."
+        }
+      ]
+    },
+    {
+      description: "Du hast gerade oc apply -f deployment.yaml ausgeführt. Ohne etwas an der Datei zu ändern, führst du den Befehl direkt nochmal aus.",
+      question: "Was passiert?",
+      options: [
+        {
+          text: "Nichts. Kubernetes stellt fest, dass der gewünschte Zustand bereits dem aktuellen entspricht.",
+          correct: true,
+          feedback: "Genau! oc apply ist idempotent — ohne Änderung in der YAML passiert auch nichts am Cluster."
+        },
+        {
+          text: "Die Pods werden neu gestartet.",
+          correct: false,
+          feedback: "Nein, ein erneutes apply ohne Änderung löst keinen Rollout aus."
+        },
+        {
+          text: "Es gibt eine Fehlermeldung, weil die Ressource schon existiert.",
+          correct: false,
+          feedback: "Das wäre bei oc create der Fall. oc apply ist genau dafür gedacht, wiederholt ausgeführt zu werden."
+        },
+        {
+          text: "Es wird ein Backup des vorherigen Zustands erstellt.",
+          correct: false,
+          feedback: "Kubernetes erstellt keine automatischen Backups bei apply."
+        }
+      ]
+    },
+    {
+      description: "Du hast ein Deployment 'recipes-backend' mit oc apply -f deployment.yaml angelegt. Jetzt änderst du in der YAML-Datei den Namen von 'recipes-backend' auf 'recipes-api' und führst erneut oc apply -f deployment.yaml aus.",
+      question: "Was passiert?",
+      code: "# vorher\nmetadata:\n  name: recipes-backend\n\n# nachher\nmetadata:\n  name: recipes-api",
+      options: [
+        {
+          text: "Es wird ein zweites Deployment 'recipes-api' erstellt. Das alte Deployment 'recipes-backend' bleibt bestehen.",
+          correct: true,
+          feedback: "Richtig! Der Name ist die Identität der Ressource. Kubernetes erkennt 'recipes-api' als neue, bisher unbekannte Ressource und erstellt sie. Das alte 'recipes-backend' wird nicht angefasst — es läuft weiter."
+        },
+        {
+          text: "Das bestehende Deployment wird von 'recipes-backend' in 'recipes-api' umbenannt.",
+          correct: false,
+          feedback: "Kubernetes kann Ressourcen nicht umbenennen. Der Name ist unveränderlich und dient als Identifikator."
+        },
+        {
+          text: "Es gibt einen Fehler, weil man den Namen nicht ändern darf.",
+          correct: false,
+          feedback: "Kein Fehler — Kubernetes sieht es einfach als ein neues Deployment mit einem neuen Namen."
+        },
+        {
+          text: "Das alte Deployment 'recipes-backend' wird automatisch gelöscht und durch 'recipes-api' ersetzt.",
+          correct: false,
+          feedback: "Kubernetes vergleicht anhand des Namens. Es weiß nicht, dass 'recipes-api' ein Ersatz für 'recipes-backend' sein soll."
+        }
+      ]
+    },
+    {
+      description: "Du möchtest ein Deployment erstellen, das es noch nicht gibt.",
+      question: "Was ist der Unterschied zwischen oc create und oc apply?",
+      options: [
+        {
+          text: "oc create erstellt nur neue Ressourcen und schlägt fehl, wenn sie existieren. oc apply erstellt oder aktualisiert — je nachdem, ob die Ressource schon existiert.",
+          correct: true,
+          feedback: "Richtig! oc apply ist flexibler: es erstellt, wenn nötig, und ändert, wenn vorhanden."
+        },
+        {
+          text: "oc create ist für Deployments, oc apply für Services.",
+          correct: false,
+          feedback: "Beide Befehle funktionieren mit allen Ressourcentypen."
+        },
+        {
+          text: "Es gibt keinen Unterschied, die Befehle sind Aliase.",
+          correct: false,
+          feedback: "Sie verhalten sich unterschiedlich bei bereits existierenden Ressourcen."
+        },
+        {
+          text: "oc apply ist veraltet und sollte nicht mehr verwendet werden.",
+          correct: false,
+          feedback: "Im Gegenteil: oc apply -f ist der empfohlene Weg für deklaratives Arbeiten."
+        }
+      ]
+    },
+    {
+      description: "Kubernetes wird oft als 'deklarativ' beschrieben.",
+      question: "Was bedeutet 'deklarativ' im Kontext von Kubernetes?",
+      options: [
+        {
+          text: "Ich beschreibe den gewünschten Zustand (z.B. '3 Replicas'), und Kubernetes sorgt selbstständig dafür, dass dieser Zustand erreicht und aufrechterhalten wird.",
+          correct: true,
+          feedback: "Genau! Du sagst WAS du willst, nicht WIE es umgesetzt werden soll. Kubernetes kümmert sich um die Schritte."
+        },
+        {
+          text: "Ich gebe Kubernetes Schritt-für-Schritt-Befehle: 'Starte Container 1, dann Container 2, dann verbinde sie.'",
+          correct: false,
+          feedback: "Das wäre imperativ. Kubernetes arbeitet deklarativ: du beschreibst das Ziel, nicht den Weg."
+        },
+        {
+          text: "Kubernetes fragt mich bei jedem Schritt, ob es weitermachen soll.",
+          correct: false,
+          feedback: "Nein, Kubernetes arbeitet autonom auf Basis deiner Deklaration."
+        },
+        {
+          text: "Deklarativ bedeutet, dass alle Befehle dokumentiert werden.",
+          correct: false,
+          feedback: "Es bezieht sich auf die Art, wie man den gewünschten Zustand beschreibt, nicht auf Dokumentation."
+        }
+      ]
+    },
+    {
+      description: "Ein Unternehmen überlegt, warum es seine Anwendungen auf Kubernetes betreiben sollte.",
+      question: "Welche zwei Hauptvorteile bringt Kubernetes mit sich?",
+      options: [
+        {
+          text: "Verteilung auf mehrere Maschinen (Distribution) und Hochverfügbarkeit (High Availability).",
+          correct: true,
+          feedback: "Richtig! Kubernetes verteilt Workloads über Nodes und sorgt dafür, dass bei Ausfällen automatisch neue Pods gestartet werden."
+        },
+        {
+          text: "Schnellere Programmiersprachen und bessere Datenbanken.",
+          correct: false,
+          feedback: "Kubernetes hat keinen Einfluss auf die Programmiersprache oder Datenbankwahl."
+        },
+        {
+          text: "Automatische Code-Reviews und Deployment-Genehmigungen.",
+          correct: false,
+          feedback: "Das sind Aufgaben von CI/CD-Pipelines und Code-Management, nicht von Kubernetes."
+        },
+        {
+          text: "Günstigere Cloud-Kosten und schnelleres Internet.",
+          correct: false,
+          feedback: "Kubernetes kann die Ressourcennutzung optimieren, garantiert aber nicht automatisch geringere Kosten."
+        }
+      ]
+    },
+    {
+      description: "Du hast drei YAML-Dateien: service.yaml, route.yaml und deployment.yaml.",
+      question: "Spielt die Reihenfolge eine Rolle, wenn du sie mit oc apply -f anlegst?",
+      options: [
+        {
+          text: "Nein. Da Kubernetes deklarativ arbeitet, konvergiert der Cluster zum gewünschten Zustand — unabhängig von der Reihenfolge.",
+          correct: true,
+          feedback: "Richtig! Ein Service kann auf ein Deployment verweisen, das noch nicht existiert. Sobald das Deployment da ist, greift der Selektor. Die Reihenfolge ist egal."
+        },
+        {
+          text: "Ja, das Deployment muss zuerst angelegt werden, sonst gibt es Fehler.",
+          correct: false,
+          feedback: "Ein Service mit einem Label-Selektor funktioniert auch, wenn noch keine passenden Pods existieren — er findet sie dann einfach nicht."
+        },
+        {
+          text: "Ja, die Route muss zuerst existieren, damit der Service sie finden kann.",
+          correct: false,
+          feedback: "Die Route verweist auf den Service, nicht umgekehrt. Aber selbst die Route kann vor dem Service angelegt werden."
+        },
+        {
+          text: "Ja, man muss immer alphabetisch sortiert deployen.",
+          correct: false,
+          feedback: "Kubernetes kennt keine alphabetische Reihenfolge für Ressourcen."
+        }
+      ]
+    },
+    {
+      description: "Ein Pod startet nicht und bleibt im Status 'CrashLoopBackOff'.",
+      question: "Mit welchen Befehlen kannst du den Fehler analysieren?",
+      options: [
+        {
+          text: "oc describe pod <name> für Events und Konfiguration, oc logs <name> für die Anwendungsausgabe.",
+          correct: true,
+          feedback: "Richtig! oc describe zeigt Events, Conditions und Konfigurationsdetails. oc logs zeigt die stdout/stderr-Ausgabe des Containers."
+        },
+        {
+          text: "oc delete pod <name> und dann nochmal versuchen.",
+          correct: false,
+          feedback: "Das behebt nicht die Ursache. Bei einem Deployment wird ohnehin ein neuer Pod mit demselben Fehler erstellt."
+        },
+        {
+          text: "oc restart cluster, um den gesamten Cluster neu zu starten.",
+          correct: false,
+          feedback: "Diesen Befehl gibt es nicht, und ein Cluster-Neustart wäre auch keine sinnvolle Fehlersuche."
+        },
+        {
+          text: "Man kann Fehler in Kubernetes nicht analysieren, man muss raten.",
+          correct: false,
+          feedback: "Kubernetes bietet umfangreiche Diagnose-Tools wie describe, logs, get events und mehr."
+        }
+      ]
+    },
+    {
+      description: "Du legst ein neues Deployment an, das auf ein Container-Image aus einer Registry verweist.",
+      question: "Wann wird das Container-Image heruntergeladen (gepullt)?",
+      options: [
+        {
+          text: "Wenn ein Pod auf einem Node gescheduled wird und das Image dort noch nicht vorhanden ist.",
+          correct: true,
+          feedback: "Richtig! Der Kubelet auf dem Node lädt das Image bei Bedarf. Die imagePullPolicy steuert, ob immer neu gepullt wird oder ein lokaler Cache genutzt werden kann."
+        },
+        {
+          text: "Sofort beim Ausführen von oc apply -f, noch bevor der Pod erstellt wird.",
+          correct: false,
+          feedback: "Nein, oc apply übergibt nur die Deklaration. Das Image wird erst gepullt, wenn ein Pod tatsächlich auf einem Node starten soll."
+        },
+        {
+          text: "Das Image muss manuell auf jeden Node kopiert werden.",
+          correct: false,
+          feedback: "Kubernetes und die Container-Runtime kümmern sich automatisch um den Image-Pull."
+        },
+        {
+          text: "Einmalig beim Anlegen des Clusters, danach nie wieder.",
+          correct: false,
+          feedback: "Images werden pro Node bei Bedarf gepullt, nicht beim Cluster-Setup."
+        }
+      ]
+    },
+    {
+      description: "Wenn du ein Deployment aktualisierst (z.B. ein neues Image-Tag), muss Kubernetes die alten Pods durch neue ersetzen.",
+      question: "Was beschreibt die Deployment-Strategy 'RollingUpdate'?",
+      options: [
+        {
+          text: "Alte Pods werden schrittweise durch neue ersetzt, sodass die Anwendung während des Updates verfügbar bleibt.",
+          correct: true,
+          feedback: "Richtig! RollingUpdate ist die Standard-Strategie. Kubernetes startet neue Pods und beendet alte nach und nach, ohne Downtime."
+        },
+        {
+          text: "Alle alten Pods werden sofort gestoppt, dann werden die neuen gestartet.",
+          correct: false,
+          feedback: "Das wäre die Strategie 'Recreate'. Bei RollingUpdate gibt es keine Phase, in der gar kein Pod läuft."
+        },
+        {
+          text: "Das Update wird rückwärts durchgeführt, vom letzten Pod zum ersten.",
+          correct: false,
+          feedback: "Rolling bezieht sich auf den schrittweisen Austausch, nicht auf eine Reihenfolge."
+        },
+        {
+          text: "Das Update findet nur an Wochenenden statt.",
+          correct: false,
+          feedback: "Kubernetes-Updates haben nichts mit dem Kalender zu tun."
+        }
+      ]
+    },
+    {
+      description: "Du hast ein Deployment mit replicas: 3. Einer der Worker Nodes fällt aus, auf dem ein Pod lief.",
+      question: "Was passiert?",
+      options: [
+        {
+          text: "Kubernetes erkennt, dass nur noch 2 Pods laufen, und startet automatisch einen neuen Pod auf einem anderen Node.",
+          correct: true,
+          feedback: "Richtig! Der Controller Manager vergleicht kontinuierlich Soll- und Ist-Zustand und stellt die gewünschte Replica-Anzahl wieder her."
+        },
+        {
+          text: "Nichts. Die Anwendung läuft mit 2 statt 3 Pods weiter, bis jemand eingreift.",
+          correct: false,
+          feedback: "Kubernetes arbeitet selbstheilend und stellt den deklarierten Zustand automatisch wieder her."
+        },
+        {
+          text: "Der gesamte Cluster wird heruntergefahren.",
+          correct: false,
+          feedback: "Der Ausfall eines Nodes betrifft nur die Pods auf diesem Node, nicht den Cluster."
+        },
+        {
+          text: "Die Anwendung ist komplett offline, bis der Node repariert wird.",
+          correct: false,
+          feedback: "Die anderen 2 Pods auf gesunden Nodes laufen weiter und bedienen Anfragen."
+        }
+      ]
+    },
+    {
+      description: "In Kubernetes und OpenShift gibt es verschiedene Ressourcentypen, die zusammenarbeiten.",
+      question: "Was ist die Aufgabe eines Service?",
+      options: [
+        {
+          text: "Er stellt einen stabilen Netzwerk-Endpunkt bereit und verteilt Traffic auf die passenden Pods, auch wenn diese sich ändern.",
+          correct: true,
+          feedback: "Richtig! Ein Service hat eine feste IP und einen DNS-Namen. Er findet Pods über Label-Selektoren und verteilt Anfragen per Load Balancing."
+        },
+        {
+          text: "Er startet und stoppt Container.",
+          correct: false,
+          feedback: "Das ist die Aufgabe des Deployments und des Kubelet."
+        },
+        {
+          text: "Er speichert Konfigurationsdaten wie Datenbank-URLs.",
+          correct: false,
+          feedback: "Das ist die Aufgabe von ConfigMaps."
+        },
+        {
+          text: "Er macht die Anwendung über das Internet erreichbar.",
+          correct: false,
+          feedback: "Das ist die Aufgabe einer Route (OpenShift) bzw. eines Ingress (Kubernetes). Der Service arbeitet cluster-intern."
+        }
+      ]
+    },
+    {
+      description: "Du möchtest deine Anwendung im Cluster von außen erreichbar machen.",
+      question: "Welche OpenShift-Ressource brauchst du dafür?",
+      options: [
+        {
+          text: "Eine Route, die auf den Service verweist.",
+          correct: true,
+          feedback: "Richtig! Die Route ist das OpenShift-Äquivalent zu einem Kubernetes Ingress. Sie verbindet einen externen Hostnamen mit einem Service."
+        },
+        {
+          text: "Ein zweites Deployment mit dem Label 'external: true'.",
+          correct: false,
+          feedback: "Deployments steuern keine Netzwerk-Erreichbarkeit."
+        },
+        {
+          text: "Ein Pod mit Port 443.",
+          correct: false,
+          feedback: "Ein Pod allein ist von außen nicht erreichbar. Du brauchst einen Service und eine Route."
+        },
+        {
+          text: "Eine ConfigMap mit der externen URL.",
+          correct: false,
+          feedback: "ConfigMaps speichern Konfiguration, steuern aber keine Netzwerk-Routen."
+        }
+      ]
+    },
+    {
+      description: "Beim Deployment eines Pods siehst du den Status 'ImagePullBackOff'.",
+      question: "Was bedeutet das?",
+      options: [
+        {
+          text: "Kubernetes konnte das angegebene Container-Image nicht aus der Registry herunterladen — z.B. wegen eines falschen Image-Namens, Tags oder fehlender Zugangsdaten.",
+          correct: true,
+          feedback: "Richtig! 'ImagePullBackOff' bedeutet, dass der Pull mehrfach fehlgeschlagen ist. Mit oc describe pod siehst du die genaue Ursache in den Events."
+        },
+        {
+          text: "Der Pod läuft, hat aber Performance-Probleme.",
+          correct: false,
+          feedback: "Bei ImagePullBackOff ist der Container noch gar nicht gestartet."
+        },
+        {
+          text: "Das Image ist zu groß für den Cluster.",
+          correct: false,
+          feedback: "Es gibt kein generelles Größenlimit. Der Fehler liegt beim Zugriff auf die Registry."
+        },
+        {
+          text: "Ein anderer Pod benutzt dasselbe Image und blockiert es.",
+          correct: false,
+          feedback: "Mehrere Pods können dasselbe Image gleichzeitig nutzen, das blockiert nichts."
+        }
+      ]
+    }
+  ];
+
+  let currentQuestion = 0;
+  let score = 0;
+
+  const questionContent = document.getElementById('question-content');
+  const optionsContainer = document.getElementById('options-container');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('next-btn');
+  const progressBar = document.getElementById('progress-bar');
+  const questionCounter = document.getElementById('question-counter');
+  const scoreCounter = document.getElementById('score-counter');
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function loadQuestion() {
+    const q = questions[currentQuestion];
+    shuffleArray(q.options);
+    feedbackEl.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+
+    progressBar.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+    questionCounter.innerText = `Frage ${currentQuestion + 1} von ${questions.length}`;
+    scoreCounter.innerText = `Punkte: ${score}`;
+
+    let html = `
+                <p class="text-neutral-400 mb-4 italic">"${q.description}"</p>
+                <div class="bg-[#111111] p-4 rounded-xl border-l-4 border-[#ff5401] mb-6">
+                    <p class="text-lg font-medium text-white">${q.question}</p>
+                </div>
+            `;
+
+    if (q.code) {
+      html += `<pre class="code-block p-4 rounded-lg text-sm text-green-400 mb-6 overflow-x-auto shadow-inner">${q.code}</pre>`;
+    }
+
+    questionContent.innerHTML = html;
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach((opt, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn w-full p-4 rounded-xl text-neutral-200 shadow-sm hover:translate-x-1';
+      btn.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="flex-none w-6 h-6 rounded-full bg-[#333333] flex items-center justify-center text-xs font-bold">${String.fromCharCode(65 + index)}</span>
+                        <span>${opt.text}</span>
+                    </div>
+                `;
+      btn.onclick = () => handleAnswer(index);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(index) {
+    const q = questions[currentQuestion];
+    const isCorrect = q.options[index].correct;
+    const buttons = optionsContainer.querySelectorAll('.option-btn');
+
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      btn.classList.remove('hover:translate-x-1');
+    });
+
+    if (isCorrect) {
+      buttons[index].classList.add('correct');
+      score++;
+    } else {
+      buttons[index].classList.add('wrong');
+      const correctIdx = q.options.findIndex(o => o.correct);
+      buttons[correctIdx].classList.add('correct');
+    }
+
+    feedbackEl.innerText = q.options[index].feedback;
+    feedbackEl.className = `mt-6 p-4 rounded-xl border-l-4 ${isCorrect ? 'bg-emerald-900/20 border-emerald-500 text-emerald-300' : 'bg-[#431407]/50 border-[#ff5401] text-orange-300'}`;
+    feedbackEl.classList.remove('hidden');
+    nextBtn.classList.remove('hidden');
+    scoreCounter.innerText = `Punkte: ${score}`;
+  }
+
+  nextBtn.onclick = () => {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  };
+
+  function showResult() {
+    document.getElementById('question-card').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    progressBar.style.width = '100%';
+
+    const percentage = (score / questions.length) * 100;
+    let interpretation = "";
+
+    if (percentage === 100) interpretation = "Herausragend! Kubernetes und OpenShift sitzen perfekt.";
+    else if (percentage >= 80) interpretation = "Sehr gut! Du hast die Grundlagen solide drauf.";
+    else if (percentage >= 50) interpretation = "Gute Basis! Die wichtigsten Konzepte sitzen schon.";
+    else interpretation = "Ein guter Start! Schau dir die Erklärungen nochmal in Ruhe an.";
+
+    document.getElementById('final-score').innerText = `${score} von ${questions.length} Punkten (${Math.round(percentage)}%)`;
+    document.getElementById('score-interpretation').innerText = interpretation;
+  }
+
+  shuffleArray(questions);
+  loadQuestion();
+</script>
+</body>
+</html>
