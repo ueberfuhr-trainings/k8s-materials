@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreuzworträtsel Generator - ATVANTAGE Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111111; /* Tiefer neutraler Hintergrund */
+            color: #eeeeee;
+        }
+
+        /* Top Bar Style mit dem spezifischen Orange #ff5401 */
+        .academy-header {
+            background-color: #1e1e1e;
+            border-bottom: 3px solid #ff5401;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Feste Kästchengröße von 38px */
+        .grid-cell {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid #333333;
+            background: #2a2a2a;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            border-radius: 2px;
+        }
+
+        .grid-cell.empty {
+            background: transparent;
+            border: none;
+        }
+
+        /* Dunkles Kästchen für Leerzeichen */
+        .grid-cell.space-separator {
+            background: #000000 !important;
+            border: 1px solid #222222;
+            cursor: default;
+        }
+
+        .grid-cell input {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #ffffff;
+            z-index: 10;
+        }
+
+        .grid-cell.solution-cell::after {
+            content: attr(data-solution-index);
+            position: absolute;
+            bottom: 1px;
+            right: 2px;
+            font-size: 0.6rem;
+            color: #ff5401;
+            font-weight: bold;
+        }
+
+        .grid-cell.solution-cell {
+            background-color: #262626;
+            box-shadow: inset 0 0 0 2px #ff5401;
+        }
+
+        .clue-number {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 0.6rem;
+            color: #aaaaaa;
+            pointer-events: none;
+            font-weight: 700;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Status-Farben */
+        .word-correct {
+            background-color: #14532d !important;
+            border-color: #22c55e !important;
+        }
+
+        .word-correct input {
+            color: #dcfce7;
+        }
+
+        .word-incorrect {
+            background-color: #431407 !important;
+            border-color: #ff5401 !important;
+        }
+
+        .word-incorrect input {
+            color: #ff5401;
+        }
+
+        .focused-cell {
+            background-color: #404040 !important;
+            box-shadow: 0 0 0 3px #ff5401;
+            z-index: 20;
+        }
+
+        .highlight-word {
+            background-color: #262626 !important;
+            border-color: #444444 !important;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #crossword-container {
+            width: 100%;
+            overflow: auto;
+            padding: 20px;
+            display: block;
+        }
+
+        #grid-render {
+            margin: 0 auto;
+            min-width: max-content;
+        }
+
+        kbd {
+            background: #262626;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-size: 0.75rem;
+            color: #cccccc;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-primary {
+            background-color: #ff5401;
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #e64a00;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #333333;
+            color: #eeeeee;
+            border: 1px solid #444444;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444444;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #111111;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 10px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #444444;
+        }
+
+        /* Lösungswort-Felder */
+        .sol-input-box {
+            width: 38px;
+            height: 48px;
+            background-color: #1e1e1e;
+            border: 2px solid #333333;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .sol-input-box:focus {
+            border-color: #ff5401;
+        }
+
+        .sol-input-prefilled {
+            background-color: #111111 !important;
+            color: #666666 !important;
+            border-color: #222222 !important;
+            cursor: not-allowed;
+        }
+
+        .solution-space-divider {
+            width: 38px;
+            height: 48px;
+            background: #000000;
+            border: 1px solid #222222;
+            border-radius: 4px;
+        }
+
+        /* Hover Brücke für E-Mail Popup */
+        .email-hover-bridge::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Academy Top Bar -->
+<nav class="academy-header sticky top-0 z-40 w-full px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <span class="text-xl font-black tracking-tighter text-[#ff5401]">ATVANTAGE</span>
+        <span class="text-xl font-light text-neutral-500">Academy</span>
+    </div>
+    <div class="flex items-center gap-4">
+        <!-- Email Wrapper with Hover Popover -->
+        <div class="relative group">
+            <button id="email-btn" class="p-2 text-neutral-400 hover:text-[#ff5401] transition-colors"
+                    title="E-Mail Kontakt">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </button>
+
+            <!-- Hover Popover mit Brücke -->
+            <div class="absolute right-0 top-10 hidden group-hover:flex items-center gap-3 bg-[#2a2a2a] border border-[#333333] p-2 px-3 rounded-lg shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 email-hover-bridge">
+                <a id="email-link-display" href="#"
+                   class="text-sm font-medium text-slate-300 hover:text-[#ff5401] transition-colors underline decoration-dotted underline-offset-4 decoration-slate-600">academy@atvantage.com</a>
+                <button id="copy-email-sub-btn"
+                        class="bg-[#ff5401] hover:bg-[#e64a00] p-1.5 rounded transition-colors text-[#111111]"
+                        title="Kopieren">
+                    <svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    <svg id="check-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="w-full p-4 md:p-8">
+    <header class="mb-10 text-center">
+        <h1 class="text-4xl font-extrabold text-white mb-2 tracking-tight">Crossword <span class="text-[#ff5401]">Challenge</span>
+        </h1>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+        <!-- Rätsel-Gitter: Nimmt allen verfügbaren Platz ein -->
+        <div class="flex-1 min-w-0 bg-[#1e1e1e] p-4 md:p-8 rounded-2xl shadow-xl border border-[#333333] flex flex-col min-h-[400px]">
+            <div id="crossword-container" class="custom-scroll">
+                <div id="grid-render" class="grid gap-1 inline-grid"></div>
+            </div>
+
+            <!-- Lösungswort-Anzeige -->
+            <div id="final-solution-area"
+                 class="mt-8 p-6 bg-[#111111] rounded-xl border border-[#333333] hidden text-center transition-all">
+                <h3 class="font-bold text-[#ff5401] mb-4 uppercase tracking-widest text-xs">Finales Lösungswort</h3>
+                <div id="final-solution-inputs" class="flex flex-wrap justify-center gap-2"></div>
+                <p id="success-msg" class="mt-6 text-emerald-400 font-bold hidden animate-bounce text-lg">Hervorragend!
+                    Das Rätsel ist gelöst! 🏆</p>
+            </div>
+        </div>
+
+        <!-- Hinweise/Fragen: Feste Breite auf Desktop -->
+        <div class="w-full lg:w-[520px] flex-shrink-0 space-y-6">
+            <div class="bg-[#1e1e1e] p-6 rounded-2xl shadow-xl border border-[#333333]">
+                <h2 class="text-lg font-bold mb-6 flex items-center text-white">
+                    <span class="bg-[#ff5401] text-[#111111] w-6 h-6 rounded flex items-center justify-center mr-3 text-xs font-black">?</span>
+                    Hinweise
+                </h2>
+
+                <div class="space-y-8">
+                    <div>
+                        <h3 id="label-h"
+                            class="text-[#ff5401] text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-[#333333] pb-2">
+                            Waagerecht</h3>
+                        <ul id="clues-horizontal" class="space-y-3 text-sm text-neutral-300"></ul>
+                    </div>
+                    <div>
+                        <h3 id="label-v"
+                            class="text-[#ff5401] text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-[#333333] pb-2">
+                            Senkrecht</h3>
+                        <ul id="clues-vertical" class="space-y-3 text-sm text-neutral-300"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Steuerungs-Panel -->
+            <div class="bg-[#1e1e1e]/50 p-6 rounded-2xl border border-[#333333]">
+                <button id="reveal-btn"
+                        class="w-full bg-neutral-700 hover:bg-neutral-600 text-white font-bold py-3 rounded-xl transition-all mb-4">
+                    Auflösen
+                </button>
+                <button id="reset-btn"
+                        class="w-full text-rose-400 hover:text-rose-300 text-xs font-bold py-2 transition-all opacity-60 hover:opacity-100">
+                    Eingaben leeren
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay p-4">
+    <!-- Confirm Reveal Modal -->
+    <div id="confirm-reveal-modal"
+         class="modal-content bg-[#1e1e1e] p-8 rounded-2xl shadow-2xl max-w-sm w-full hidden border border-[#333333]">
+        <h2 class="text-xl font-bold text-white mb-4 text-center">Rätsel auflösen</h2>
+        <div id="reveal-confirmation-content">
+            <p class="text-neutral-400 mb-8 leading-relaxed text-sm text-center">Möchtest du wirklich alle Buchstaben
+                anzeigen lassen?</p>
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 btn-secondary font-bold py-3 rounded-xl">Abbrechen</button>
+                <button id="confirm-reveal-yes" class="flex-1 btn-primary font-bold py-3 rounded-xl">Ja</button>
+            </div>
+        </div>
+        <div id="reveal-solution-challenge" class="hidden">
+            <p class="text-neutral-400 mb-4 leading-relaxed text-sm text-center">Gib das Lösungswort ein:</p>
+            <input type="text" id="reveal-solution-input"
+                   class="w-full bg-[#111111] border border-[#333333] rounded-xl py-3 px-4 text-white font-bold uppercase mb-4 text-center focus:border-[#ff5401] outline-none tracking-widest">
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 btn-secondary font-bold py-3 rounded-xl">Abbruch</button>
+                <button id="reveal-check-btn" class="flex-1 btn-primary font-bold py-3 rounded-xl">Lösen</button>
+            </div>
+            <p id="reveal-error" class="text-center text-rose-500 text-xs mt-3 opacity-0">Falsch!</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const FALLBACK_DATA = {
+        "title": "Kubernetes Wiederholung Tag 1",
+        "solution": "RESTAURANT",
+        "questions": [
+            {"clue": "Kleinste deploybare Einheit in Kubernetes<br><small style='color:#888'>(Im Restaurant: das Tablett mit dem fertigen Gericht)</small>", "answer": "POD"},
+            {"clue": "Beschreibt den Soll-Zustand inkl. Anzahl der Replicas<br><small style='color:#888'>(Im Restaurant: das Rezept — 'Davon immer 3 Portionen bereithalten')</small>", "answer": "DEPLOYMENT"},
+            {"clue": "Stabiler Netzwerk-Endpunkt für eine Gruppe von Pods<br><small style='color:#888'>(Im Restaurant: die Durchreiche — egal welcher Koch)</small>", "answer": "SERVICE"},
+            {"clue": "Macht einen Service von außen erreichbar (OpenShift)<br><small style='color:#888'>(Im Restaurant: die Eingangstür mit dem Namensschild)</small>", "answer": "ROUTE"},
+            {"clue": "oc _____ -f — Gewünschten Zustand an den Cluster übergeben<br><small style='color:#888'>(Im Restaurant: Bestellzettel unter der Bürotür durchschieben)</small>", "answer": "APPLY"},
+            {"clue": "Sorgt dafür, dass immer die gewünschte Anzahl Pods läuft<br><small style='color:#888'>(Im Restaurant: der Küchenchef, der ständig durchzählt)</small>", "answer": "REPLICASET"},
+            {"clue": "Gesamte Infrastruktur aus Control Plane und Worker Nodes<br><small style='color:#888'>(Im Restaurant: Gebäude, Küche und Personal)</small>", "answer": "CLUSTER"},
+            {"clue": "Maschine im Cluster, auf der Pods ausgeführt werden<br><small style='color:#888'>(Im Restaurant: ein Küchenarbeitsplatz mit Herd)</small>", "answer": "NODE"}
+        ]
+    };
+
+    let currentData = JSON.parse(JSON.stringify(FALLBACK_DATA));
+    let grid = [];
+    let wordsOnGrid = [];
+    let currentDir = 'H';
+    let lastClickedPos = {r: -1, c: -1};
+    let foundSolIndices = new Set();
+
+    /**
+     * Baut die E-Mail Adresse dynamisch zusammen
+     */
+    function getAcademyEmail() {
+        const part1 = 'academy';
+        const part2 = 'atvantage.com';
+        return part1 + '@' + part2;
+    }
+
+    async function init() {
+        // E-Mail Anzeige initialisieren
+        const emailLink = document.getElementById('email-link-display');
+        emailLink.innerText = getAcademyEmail();
+
+        rebuildGame();
+        setupEventListeners();
+    }
+
+    function rebuildGame() {
+        const msg = document.getElementById('success-msg');
+        const area = document.getElementById('final-solution-area');
+        if (msg) msg.classList.add('hidden');
+        if (area) area.classList.remove('bg-emerald-900/20', 'border-emerald-500');
+
+        generateLayout(currentData.questions);
+        renderGrid();
+        renderClues();
+
+        if (currentData.solution) setupSolutionArea();
+        else if (area) area.classList.add('hidden');
+
+        checkFinalSolution();
+    }
+
+    function generateLayout(questions) {
+        const sortedWords = questions
+            .map((q, originalIdx) => ({...q, originalIdx}))
+            .sort((a, b) => b.answer.length - a.answer.length);
+
+        const SIZE = 60;
+        grid = Array(SIZE).fill(null).map(() => Array(SIZE).fill(null));
+        wordsOnGrid = [];
+
+        if (sortedWords.length === 0) return {success: true};
+
+        placeWord(sortedWords[0], Math.floor(SIZE / 3), Math.floor(SIZE / 3), 'H', 1);
+
+        let placedIndices = [0];
+        let attempts = 0;
+
+        while (placedIndices.length < sortedWords.length && attempts < 10) {
+            for (let i = 0; i < sortedWords.length; i++) {
+                if (placedIndices.includes(i)) continue;
+                const text = sortedWords[i].answer.toUpperCase();
+                let bestStart = null;
+                for (let placedWord of wordsOnGrid) {
+                    for (let j = 0; j < placedWord.answer.length; j++) {
+                        for (let k = 0; k < text.length; k++) {
+                            if (placedWord.answer[j] === text[k] && text[k] !== ' ') {
+                                const newDir = placedWord.dir === 'H' ? 'V' : 'H';
+                                const r = newDir === 'V' ? placedWord.row - k : placedWord.row + j;
+                                const c = newDir === 'V' ? placedWord.col + j : placedWord.col - k;
+                                if (canPlaceWord(text, r, c, newDir, SIZE)) {
+                                    bestStart = {r, c, dir: newDir};
+                                    break;
+                                }
+                            }
+                        }
+                        if (bestStart) break;
+                    }
+                    if (bestStart) break;
+                }
+                if (bestStart) {
+                    placeWord(sortedWords[i], bestStart.r, bestStart.c, bestStart.dir, i + 1);
+                    placedIndices.push(i);
+                }
+            }
+            attempts++;
+        }
+
+        for (let i = 0; i < sortedWords.length; i++) {
+            if (placedIndices.includes(i)) continue;
+            const text = sortedWords[i].answer.toUpperCase();
+            let placedStandalone = false;
+            for (let r = 2; r < SIZE - 2 && !placedStandalone; r += 2) {
+                for (let c = 2; c < SIZE - 2 && !placedStandalone; c += 2) {
+                    if (canPlaceWord(text, r, c, 'H', SIZE)) {
+                        placeWord(sortedWords[i], r, c, 'H', i + 1);
+                        placedIndices.push(i);
+                        placedStandalone = true;
+                    }
+                }
+            }
+        }
+        shrinkGrid(SIZE);
+        return {success: true};
+    }
+
+    function canPlaceWord(word, row, col, dir, size) {
+        if (row < 1 || col < 1 || (dir === 'V' && row + word.length >= size - 1) || (dir === 'H' && col + word.length >= size - 1)) return false;
+        for (let i = 0; i < word.length; i++) {
+            const r = dir === 'V' ? row + i : row;
+            const c = dir === 'H' ? col + i : col;
+            if (grid[r][c] && grid[r][c].char !== word[i]) return false;
+            if (grid[r][c] && grid[r][c].char === word[i]) {
+                if (grid[r][c].words.some(w => w.dir === dir)) return false;
+            }
+            if (!grid[r][c]) {
+                const checks = dir === 'V' ? [[r, c - 1], [r, c + 1]] : [[r - 1, c], [r + 1, c]];
+                for (let [nr, nc] of checks) if (grid[nr][nc]) return false;
+                if (i === 0) {
+                    const pre = dir === 'V' ? [r - 1, c] : [r, c - 1];
+                    if (grid[pre[0]][pre[1]]) return false;
+                }
+                if (i === word.length - 1) {
+                    const post = dir === 'V' ? [r + 1, c] : [r, c + 1];
+                    if (grid[post[0]][post[1]]) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function placeWord(wordObj, row, col, dir, num) {
+        const text = wordObj.answer.toUpperCase();
+        for (let i = 0; i < text.length; i++) {
+            const r = dir === 'V' ? row + i : row;
+            const c = dir === 'H' ? col + i : col;
+            if (!grid[r][c]) {
+                grid[r][c] = {char: text[i], words: [], isSolution: false, startLabels: []};
+            }
+            if (i === 0) grid[r][c].startLabels.push({num, dir});
+            grid[r][c].words.push({text: wordObj.answer, dir});
+        }
+        wordsOnGrid.push({...wordObj, row, col, dir, num});
+    }
+
+    function shrinkGrid(size) {
+        let minR = size, maxR = 0, minC = size, maxC = 0, found = false;
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                if (grid[r][c]) {
+                    minR = Math.min(minR, r);
+                    maxR = Math.max(maxR, r);
+                    minC = Math.min(minC, c);
+                    maxC = Math.max(maxC, c);
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            grid = [[]];
+            return;
+        }
+        const newGrid = [];
+        for (let r = minR; r <= maxR; r++) newGrid.push(grid[r].slice(minC, maxC + 1));
+        wordsOnGrid.forEach(w => {
+            w.row -= minR;
+            w.col -= minC;
+        });
+        grid = newGrid;
+    }
+
+    function setupEventListeners() {
+        // E-Mail Logik (Header Button)
+        document.getElementById('email-btn').onclick = function () {
+            window.location.href = 'mailto:' + getAcademyEmail();
+        };
+
+        // E-Mail Logik (Popup Link)
+        const emailLink = document.getElementById('email-link-display');
+        emailLink.onclick = function (e) {
+            e.preventDefault();
+            window.location.href = 'mailto:' + getAcademyEmail();
+        };
+        emailLink.onmouseenter = function () {
+            this.href = 'mailto:' + getAcademyEmail();
+        };
+
+        document.getElementById('copy-email-sub-btn').onclick = function () {
+            const email = getAcademyEmail();
+            const temp = document.createElement('textarea');
+            temp.value = email;
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand('copy');
+                const copyIcon = document.getElementById('copy-icon');
+                const checkIcon = document.getElementById('check-icon');
+                copyIcon.classList.add('hidden');
+                checkIcon.classList.remove('hidden');
+                setTimeout(() => {
+                    copyIcon.classList.remove('hidden');
+                    checkIcon.classList.add('hidden');
+                }, 2000);
+            } catch (err) {
+                console.error('Kopieren fehlgeschlagen');
+            }
+            document.body.removeChild(temp);
+        };
+
+        // Reveal Logik
+        document.getElementById('reveal-btn').onclick = () => {
+            const challenge = !!currentData.solution;
+            const confirmDiv = document.getElementById('reveal-confirmation-content');
+            const challengeDiv = document.getElementById('reveal-solution-challenge');
+            const solutionInput = document.getElementById('reveal-solution-input');
+
+            confirmDiv.classList.toggle('hidden', challenge);
+            challengeDiv.classList.toggle('hidden', !challenge);
+            solutionInput.value = '';
+            document.getElementById('reveal-error').style.opacity = '0';
+
+            openModal('confirm-reveal-modal');
+
+            if (challenge) {
+                setTimeout(() => solutionInput.focus(), 50);
+            }
+        };
+        document.getElementById('confirm-reveal-yes').onclick = () => {
+            revealAll();
+            closeModal();
+        };
+        document.getElementById('reveal-check-btn').onclick = () => {
+            if (document.getElementById('reveal-solution-input').value.trim().toUpperCase() === currentData.solution.toUpperCase()) {
+                revealAll();
+                closeModal();
+            } else {
+                const e = document.getElementById('reveal-error');
+                e.style.opacity = '1';
+                setTimeout(() => e.style.opacity = '0', 2000);
+            }
+        };
+
+        document.getElementById('reveal-solution-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('reveal-check-btn').click();
+            }
+        });
+
+        // Restliche Steuerung
+        document.getElementById('reset-btn').onclick = () => {
+            document.querySelectorAll('.grid-cell input, #final-solution-inputs input').forEach(i => {
+                if (!i.readOnly) i.value = '';
+            });
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('word-correct', 'word-incorrect'));
+            checkFinalSolution();
+        };
+    }
+
+    function openModal(id) {
+        document.getElementById('modal-container').classList.remove('hidden');
+        document.querySelectorAll('.modal-content').forEach(m => m.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-container').classList.add('hidden');
+    }
+
+    function renderGrid() {
+        const container = document.getElementById('grid-render');
+        if (!grid || grid.length === 0 || grid[0].length === 0) return;
+        const h = grid.length, w = grid[0].length;
+        container.style.gridTemplateColumns = `repeat(${w}, 38px)`;
+        container.innerHTML = '';
+        assignSolutionCells();
+        for (let r = 0; r < h; r++) {
+            for (let c = 0; c < w; c++) {
+                const data = grid[r][c];
+                const div = document.createElement('div');
+                if (data && data.char === ' ') {
+                    div.className = `grid-cell space-separator`;
+                } else div.className = `grid-cell ${!data ? 'empty' : ''}`;
+                if (data) {
+                    if (data.startLabels && data.startLabels.length > 0) {
+                        const n = document.createElement('span');
+                        n.className = 'clue-number';
+                        n.innerHTML = data.startLabels.map(s => `<span>${s.num}${s.dir === 'V' ? '↓' : '→'}</span>`).join('');
+                        div.appendChild(n);
+                    }
+                    if (data.char !== ' ') {
+                        const input = document.createElement('input');
+                        input.maxLength = 1;
+                        input.dataset.row = r;
+                        input.dataset.col = c;
+                        if (data.isSolution) {
+                            div.classList.add('solution-cell');
+                            div.setAttribute('data-solution-index', data.solIndex + 1);
+                        }
+                        input.addEventListener('input', e => handleInput(e, r, c));
+                        input.addEventListener('keydown', e => handleKeyDown(e, r, c));
+                        input.addEventListener('mousedown', e => handleCellClick(r, c));
+                        input.addEventListener('focus', (e) => {
+                            updateUIFocus(r, c);
+                            e.target.select();
+                        });
+                        div.appendChild(input);
+                    }
+                }
+                container.appendChild(div);
+            }
+        }
+    }
+
+    function handleCellClick(r, c) {
+        const data = grid[r][c];
+        if (!data || data.char === ' ') return;
+        const hasH = data.words.some(w => w.dir === 'H'), hasV = data.words.some(w => w.dir === 'V');
+        if (lastClickedPos.r === r && lastClickedPos.c === c) {
+            if (hasH && hasV) currentDir = (currentDir === 'H') ? 'V' : 'H';
+        } else {
+            if (hasH && currentDir === 'H') currentDir = 'H'; else if (hasV && currentDir === 'V') currentDir = 'V'; else currentDir = hasH ? 'H' : 'V';
+        }
+        lastClickedPos = {r, c};
+        updateUIFocus(r, c);
+    }
+
+    function updateUIFocus(r, c) {
+        document.querySelectorAll('.grid-cell').forEach(el => el.classList.remove('focused-cell', 'highlight-word'));
+        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+        if (input) input.parentElement.classList.add('focused-cell');
+        const data = grid[r][c];
+        if (data) {
+            const possibleDirs = data.words.map(w => w.dir);
+            if (!possibleDirs.includes(currentDir)) currentDir = possibleDirs[0];
+            const currentWord = data.words.find(w => w.dir === currentDir);
+            if (currentWord) {
+                const wordObj = wordsOnGrid.find(w => w.answer === currentWord.text && w.dir === currentWord.dir);
+                if (wordObj) {
+                    for (let i = 0; i < wordObj.answer.length; i++) {
+                        const wr = wordObj.dir === 'V' ? wordObj.row + i : wordObj.row,
+                            wc = wordObj.dir === 'H' ? wordObj.col + i : wordObj.col;
+                        const el = document.querySelector(`input[data-row="${wr}"][data-col="${wc}"]`);
+                        const cellDiv = document.querySelector(`.grid-cell:nth-child(${(wr * grid[0].length) + wc + 1})`);
+                        if (el && el !== input) el.parentElement.classList.add('highlight-word');
+                        else if (cellDiv && grid[wr][wc]?.char === ' ') cellDiv.classList.add('highlight-word');
+                    }
+                }
+            }
+        }
+    }
+
+    function handleInput(e, r, c) {
+        const v = e.target.value.toUpperCase();
+        e.target.value = v;
+        if (v) moveInWord(r, c, 1, false);
+        checkGrid();
+        syncSolution(r, c, v);
+    }
+
+    function handleKeyDown(e, r, c) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            jumpToNextWord(r, c, e.shiftKey ? -1 : 1);
+        } else if (e.key === 'Backspace' && !e.target.value) moveInWord(r, c, -1, false);
+        else if (e.key === ' ') {
+            e.preventDefault();
+            handleCellClick(r, c);
+        } else if (e.key.startsWith('Arrow')) {
+            e.preventDefault();
+            let nr = r, nc = c;
+            if (e.key === 'ArrowRight') nc++; else if (e.key === 'ArrowLeft') nc--; else if (e.key === 'ArrowDown') nr++; else if (e.key === 'ArrowUp') nr--;
+            const next = document.querySelector(`input[data-row="${nr}"][data-col="${nc}"]`);
+            if (next) next.focus();
+        }
+    }
+
+    function moveInWord(r, c, delta, allowJump) {
+        let nr = currentDir === 'V' ? r + delta : r, nc = currentDir === 'H' ? c + delta : c;
+        if (grid[nr] && grid[nr][nc] && grid[nr][nc].char === ' ') {
+            nr = currentDir === 'V' ? nr + delta : nr;
+            nc = currentDir === 'H' ? nc + delta : nc;
+        }
+        const next = document.querySelector(`input[data-row="${nr}"][data-col="${nc}"]`);
+        if (next) next.focus(); else if (allowJump && delta > 0) jumpToNextWord(r, c, 1);
+    }
+
+    function jumpToNextWord(r, c, delta) {
+        const data = grid[r][c];
+        if (!data) return;
+        const currentWordInfo = data.words.find(w => w.dir === currentDir) || data.words[0];
+        const sorted = [...wordsOnGrid].sort((a, b) => a.num - b.num);
+        let idx = sorted.findIndex(w => w.answer === currentWordInfo.text && w.dir === currentWordInfo.dir);
+        idx = (idx + delta + sorted.length) % sorted.length;
+        const nextWord = sorted[idx];
+        currentDir = nextWord.dir;
+        const target = document.querySelector(`input[data-row="${nextWord.row}"][data-col="${nextWord.col}"]`);
+        if (target) target.focus();
+    }
+
+    function assignSolutionCells() {
+        if (!currentData.solution) return;
+        foundSolIndices.clear();
+        const sol = currentData.solution.toUpperCase().replace(/[^A-Z\s]/g, '');
+        for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) if (grid[r][c]) grid[r][c].isSolution = false;
+        for (let i = 0; i < sol.length; i++) {
+            if (sol[i] === ' ') continue;
+            const candidates = [];
+            for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] && grid[r][c].char === sol[i] && !grid[r][c].isSolution) candidates.push({r, c});
+            }
+            if (candidates.length > 0) {
+                const p = candidates[Math.floor(Math.random() * candidates.length)];
+                grid[p.r][p.c].isSolution = true;
+                grid[p.r][p.c].solIndex = i;
+                foundSolIndices.add(i);
+            }
+        }
+    }
+
+    function renderClues() {
+        const hL = document.getElementById('clues-horizontal'), vL = document.getElementById('clues-vertical');
+        hL.innerHTML = '';
+        vL.innerHTML = '';
+        wordsOnGrid.sort((a, b) => a.num - b.num).forEach(w => {
+            const li = document.createElement('li');
+            li.className = 'flex items-start p-2 rounded-xl hover:bg-[#2a2a2a] cursor-pointer transition-colors';
+            li.innerHTML = `<b class="mr-3 text-[#ff5401] min-w-[20px] font-bold">${w.num}.</b> <span class="leading-relaxed font-medium text-neutral-300">${w.clue}</span>`;
+            li.onclick = () => {
+                currentDir = w.dir;
+                const el = document.querySelector(`input[data-row="${w.row}"][data-col="${w.col}"]`);
+                if (el) el.focus();
+            };
+            if (w.dir === 'H') hL.appendChild(li); else vL.appendChild(li);
+        });
+    }
+
+    function setupSolutionArea() {
+        const area = document.getElementById('final-solution-area'),
+            box = document.getElementById('final-solution-inputs');
+        if (area) area.classList.remove('hidden');
+        box.innerHTML = '';
+        const txt = currentData.solution.toUpperCase();
+        for (let i = 0; i < txt.length; i++) {
+            if (txt[i] === ' ') {
+                const d = document.createElement('div');
+                d.className = 'solution-space-divider';
+                box.appendChild(d);
+                continue;
+            }
+            const wrap = document.createElement('div');
+            wrap.className = 'relative';
+            const isFoundInGrid = foundSolIndices.has(i);
+            const inputVal = isFoundInGrid ? "" : txt[i];
+            const prefilledClass = isFoundInGrid ? "" : "sol-input-prefilled";
+            wrap.innerHTML = `<span class="absolute -top-1 -left-1 text-[8px] font-bold text-[#ff5401]">${i + 1}</span><input type="text" class="sol-input-box ${prefilledClass}" maxlength="1" id="sol-input-${i}" value="${inputVal}" ${isFoundInGrid ? '' : 'readonly'}>`;
+            wrap.querySelector('input').addEventListener('input', checkFinalSolution);
+            box.appendChild(wrap);
+        }
+    }
+
+    function syncSolution(r, c, char) {
+        const cell = grid[r][c];
+        if (cell && cell.isSolution) {
+            const inp = document.getElementById(`sol-input-${cell.solIndex}`);
+            if (inp && !inp.readOnly) {
+                inp.value = char;
+                checkFinalSolution();
+            }
+        }
+    }
+
+    function checkGrid() {
+        document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('word-correct', 'word-incorrect'));
+        document.querySelectorAll('li').forEach(li => li.classList.remove('opacity-40', 'line-through'));
+        wordsOnGrid.forEach(w => {
+            let currentStr = "";
+            let inputs = [];
+            for (let i = 0; i < w.answer.length; i++) {
+                const r = w.dir === 'V' ? w.row + i : w.row, c = w.dir === 'H' ? w.col + i : w.col;
+                const inp = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                currentStr += (grid[r][c].char === ' ') ? ' ' : ((inp && inp.value) ? inp.value : "_");
+                if (inp) inputs.push(inp);
+            }
+            const clues = Array.from(document.querySelectorAll('li'));
+            const clueEl = clues.find(el => el.innerText.startsWith(w.num + '.'));
+            if (!currentStr.includes("_")) {
+                if (currentStr === w.answer.toUpperCase()) {
+                    inputs.forEach(i => i.parentElement.classList.add('word-correct'));
+                    if (clueEl) clueEl.classList.add('opacity-40', 'line-through');
+                } else {
+                    inputs.forEach(i => {
+                        if (!i.parentElement.classList.contains('word-correct')) i.parentElement.classList.add('word-incorrect');
+                    });
+                }
+            }
+        });
+    }
+
+    function checkFinalSolution() {
+        if (!currentData.solution) return;
+        const target = currentData.solution.toUpperCase();
+        let current = "";
+        for (let i = 0; i < target.length; i++) {
+            if (target[i] === ' ') current += ' ';
+            else {
+                const inp = document.getElementById(`sol-input-${i}`);
+                current += inp?.value || "_";
+            }
+        }
+        const msg = document.getElementById('success-msg'), area = document.getElementById('final-solution-area');
+        if (current === target) {
+            msg?.classList.remove('hidden');
+            area?.classList.add('bg-emerald-900/20', 'border-emerald-500');
+        } else {
+            msg?.classList.add('hidden');
+            area?.classList.remove('bg-emerald-900/20', 'border-emerald-500');
+        }
+    }
+
+    function revealAll() {
+        for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) {
+            const cell = grid[r][c];
+            if (cell && cell.char !== ' ') {
+                const inp = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                if (inp) {
+                    inp.value = cell.char;
+                    syncSolution(r, c, cell.char);
+                }
+            }
+        }
+        checkGrid();
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

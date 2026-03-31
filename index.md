@@ -36,6 +36,7 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 
 1. [Backend-Deployment](issues/01-backend-deployment.html) — Deployment, Service und Route für das Backend erstellen
 2. [Frontend-Deployment](issues/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
+3. [Wiederholung - Kreuzworträtsel](reflections/crossword-tag1.html)
 3. [ConfigMaps verwenden](issues/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
 4. [PostgreSQL-Datenbank](issues/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
 5. [Backend auf PostgreSQL umschalten](issues/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
