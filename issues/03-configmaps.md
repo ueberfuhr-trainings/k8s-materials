@@ -65,6 +65,10 @@ Prüfe, ob das Frontend weiterhin korrekt mit dem Backend kommuniziert. Ändere 
 oc rollout restart deployment/recipes-frontend
 ```
 
+### 4. *(Optional)* ConfigMap als YAML verwalten
+
+Du hast die ConfigMap bisher per CLI erstellt. Überlege, wie du sie stattdessen als eigenständige YAML-Datei definieren und mit `oc apply -f` anlegen könntest. Schau dir dazu die Ausgabe von `oc get configmap frontend-config -o yaml` an — was davon brauchst du, was kannst du weglassen?
+
 ## 📚 Selbstlernmaterial
 
 * [Kubernetes ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)
