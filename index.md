@@ -21,6 +21,9 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 * [kubectl/oc Cheat Sheet](docs/cli-cheatsheet.html) — Die wichtigsten CLI-Befehle für Kubernetes und OpenShift
 * [Health Checks (Probes)](docs/probes.html) — Startup, Liveness und Readiness Probes mit Beispielen
 * [PostgreSQL auf Kubernetes – Best Practices](docs/postgres-as-statefulset.html) — StatefulSet, Operatoren und produktionsreife Setups
+* [Helm Charts](docs/helm.html) — Paketmanagement für Kubernetes: Konzepte, OCI-Support, Architektur
+* [Aufbau eines Helm Charts](docs/helm-chart-struktur.html) — Alle Dateien und Verzeichnisse im Detail
+* [Helm Cheat Sheet](docs/helm-cheatsheet.html) — Die wichtigsten Helm-Befehle (klassisch und OCI)
 
 ## Container-Images
 
