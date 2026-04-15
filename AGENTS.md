@@ -42,18 +42,34 @@ Die Übungen im `issues/`-Ordner folgen einem Template (`issue_template.md`) mit
 - Selbstlernmaterial (Links)
 - Reflexionsfragen
 
+### Plattform-Varianten
+
+Die Übungen existieren in zwei Varianten, jeweils in einem eigenen Unterverzeichnis:
+
+- **`issues/openshift/`** — OpenShift-Variante: verwendet `oc` CLI und Routes (`route.openshift.io/v1`)
+- **`issues/kubernetes/`** — Kubernetes-Variante: verwendet `kubectl` CLI und Ingress (`networking.k8s.io/v1`)
+
+Die Übungsinhalte sind ansonsten identisch. Bei Änderungen an einer Übung müssen **beide Varianten** angepasst werden. Die wesentlichen Unterschiede sind:
+
+| Aspekt | OpenShift | Kubernetes |
+|--------|-----------|------------|
+| CLI | `oc` | `kubectl` |
+| Externer Zugriff | Route | Ingress |
+| Texte/Titel | "in OpenShift deployen" | "in Kubernetes deployen" |
+
 ## Reihenfolge der Übungen
 
-1. **Backend-Deployment** — Deployment, Service, Route mit YAML
+1. **Backend-Deployment** — Deployment, Service, Route/Ingress mit YAML
 2. **Frontend-Deployment** — Deployment mit Umgebungsvariable `API_BASE_URL`
 3. **ConfigMaps** — Backend-URL in ConfigMap auslagern
 4. **PostgreSQL-Setup** — PostgreSQL-Deployment, Secrets, ConfigMaps für Init-SQL
 5. **Backend auf PostgreSQL umschalten** — `latest`-Tag mit DB-Konfiguration aus Secrets
 6. **Liveness- und Readiness-Probes** — Health Checks für Backend, Frontend und Datenbank
+7. **Helm Charts** — Anwendung als Helm Charts paketieren
 
 ## Hinweise für die Generierung
 
 - Übungen sind in deutscher Sprache verfasst
-- YAML-Beispiele verwenden `oc` (OpenShift CLI), nicht `kubectl`
 - Die Übungen bauen aufeinander auf
 - PostgreSQL wird ohne PVC deployed (Persistent Volumes sind in der Schulungsumgebung nicht erlaubt)
+- Bei neuen oder geänderten Übungen immer beide Plattform-Varianten (OpenShift und Kubernetes) pflegen

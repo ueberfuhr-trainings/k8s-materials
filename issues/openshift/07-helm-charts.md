@@ -225,9 +225,9 @@ curl -s https://<backend-route-url>/recipes | jq
 
 ## 📚 Selbstlernmaterial
 
-* [Helm Charts](../docs/helm.html) — Konzepte, OCI-Support, Architektur
-* [Aufbau eines Helm Charts](../docs/helm-chart-struktur.html) — Alle Dateien und Verzeichnisse im Detail
-* [Helm Cheat Sheet](../docs/helm-cheatsheet.html) — Die wichtigsten Helm-Befehle
+* [Helm Charts](../../docs/helm.html) — Konzepte, OCI-Support, Architektur
+* [Aufbau eines Helm Charts](../../docs/helm-chart-struktur.html) — Alle Dateien und Verzeichnisse im Detail
+* [Helm Cheat Sheet](../../docs/helm-cheatsheet.html) — Die wichtigsten Helm-Befehle
 * [Helm Template-Guide](https://helm.sh/docs/chart_template_guide/)
 * [Helm Dependency Management](https://helm.sh/docs/helm/helm_dependency/)
 

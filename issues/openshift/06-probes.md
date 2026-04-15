@@ -65,7 +65,7 @@ Teste, was passiert, wenn eine Probe fehlschlägt — z.B. indem Du die Datenban
 
 ## 📚 Selbstlernmaterial
 
-* [Health Checks (Probes) — Erklärung und Beispiele](../docs/probes.html) — Startup, Liveness, Readiness im Detail mit Beispielen für NGINX, Quarkus, Spring Boot und PostgreSQL
+* [Health Checks (Probes) — Erklärung und Beispiele](../../docs/probes.html) — Startup, Liveness, Readiness im Detail mit Beispielen für NGINX, Quarkus, Spring Boot und PostgreSQL
 * [Kubernetes: Liveness, Readiness und Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 * [Kubernetes: Pod Lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
 * [Recipes-Backend Docker Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-backend) — Dokumentation der Health-Check-Endpunkte

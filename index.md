@@ -7,7 +7,7 @@ title: Kubernetes/OpenShift - Schulungsunterlagen
 
 Willkommen zu den Übungen für den Kurs **Kubernetes/OpenShift**!
 
-In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung bestehend aus einem Backend und einem Frontend in OpenShift.
+In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung bestehend aus einem Backend und einem Frontend in Kubernetes bzw. OpenShift.
 
 ## Zum Einstieg
 
@@ -32,13 +32,24 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 | `ralfueberfuhr/recipes-backend`  | [Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-backend)  | REST-Backend (Quarkus)       |
 | `ralfueberfuhr/recipes-frontend` | [Hub](https://hub.docker.com/r/ralfueberfuhr/recipes-frontend) | Web-Frontend (Angular/NGINX) |
 
-## Übungen
+## Übungen (OpenShift)
 
-1. [Backend-Deployment](issues/01-backend-deployment.html) — Deployment, Service und Route für das Backend erstellen
-2. [Frontend-Deployment](issues/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
+1. [Backend-Deployment](issues/openshift/01-backend-deployment.html) — Deployment, Service und Route für das Backend erstellen
+2. [Frontend-Deployment](issues/openshift/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
 3. [Kreuzworträtsel](reflections/crossword-tag1.html) / [Quiz](reflections/quiz-tag1.html) — Wiederholung
-3. [ConfigMaps verwenden](issues/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
-4. [PostgreSQL-Datenbank](issues/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
-5. [Backend auf PostgreSQL umschalten](issues/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
-6. [Liveness- und Readiness-Probes](issues/06-probes.html) — Health Checks für Backend, Frontend und Datenbank
-7. [Helm Charts](issues/07-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+3. [ConfigMaps verwenden](issues/openshift/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
+4. [PostgreSQL-Datenbank](issues/openshift/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
+5. [Backend auf PostgreSQL umschalten](issues/openshift/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
+6. [Liveness- und Readiness-Probes](issues/openshift/06-probes.html) — Health Checks für Backend, Frontend und Datenbank
+7. [Helm Charts](issues/openshift/07-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+
+## Übungen (Kubernetes)
+
+1. [Backend-Deployment](issues/kubernetes/01-backend-deployment.html) — Deployment, Service und Ingress für das Backend erstellen
+2. [Frontend-Deployment](issues/kubernetes/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
+3. [Kreuzworträtsel](reflections/crossword-tag1.html) / [Quiz](reflections/quiz-tag1.html) — Wiederholung
+3. [ConfigMaps verwenden](issues/kubernetes/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
+4. [PostgreSQL-Datenbank](issues/kubernetes/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
+5. [Backend auf PostgreSQL umschalten](issues/kubernetes/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
+6. [Liveness- und Readiness-Probes](issues/kubernetes/06-probes.html) — Health Checks für Backend, Frontend und Datenbank
+7. [Helm Charts](issues/kubernetes/07-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen

@@ -3,13 +3,13 @@ layout: default
 title: "Übung 4: PostgreSQL-Datenbank"
 ---
 
-# PostgreSQL-Datenbank in OpenShift bereitstellen
+# PostgreSQL-Datenbank in Kubernetes bereitstellen
 
-Als Entwickler möchte ich eine PostgreSQL-Datenbank in OpenShift deployen und die Zugangsdaten sicher in Secrets verwalten, damit das Backend später auf eine echte Datenbank umgestellt werden kann.
+Als Entwickler möchte ich eine PostgreSQL-Datenbank in Kubernetes deployen und die Zugangsdaten sicher in Secrets verwalten, damit das Backend später auf eine echte Datenbank umgestellt werden kann.
 
 ## 🎯 Lernziele
 
-* Du kannst eine Datenbank als Container in Kubernetes/OpenShift deployen.
+* Du kannst eine Datenbank als Container in Kubernetes deployen.
 * Du verstehst den Unterschied zwischen ConfigMaps und Secrets.
 * Du kannst Secrets erstellen und in Deployments verwenden.
 * Du kannst eine ConfigMap nutzen, um Initialisierungs-Skripte in einen Container einzubinden (Volume Mount).
@@ -40,7 +40,7 @@ stringData:
 ```
 
 ```bash
-oc apply -f postgres-secret.yaml
+kubectl apply -f postgres-secret.yaml
 ```
 
 ### 2. ConfigMap für Datenbanknamen erstellen
@@ -55,7 +55,7 @@ data:
 ```
 
 ```bash
-oc apply -f postgres-config.yaml
+kubectl apply -f postgres-config.yaml
 ```
 
 ### 3. ConfigMap für das Init-SQL erstellen
@@ -90,12 +90,12 @@ data:
 ```
 
 ```bash
-oc apply -f postgres-init-sql.yaml
+kubectl apply -f postgres-init-sql.yaml
 ```
 
 ### 4. PostgreSQL-Deployment erstellen
 
-> **Hinweis:** Wir verwenden hier der Einfachheit halber ein Deployment ohne Persistent Volume. Für produktive Szenarien wäre ein **StatefulSet** mit PersistentVolumeClaim die richtige Wahl — siehe [PostgreSQL auf Kubernetes – Best Practices](../docs/postgres-as-statefulset.html).
+> **Hinweis:** Wir verwenden hier der Einfachheit halber ein Deployment ohne Persistent Volume. Für produktive Szenarien wäre ein **StatefulSet** mit PersistentVolumeClaim die richtige Wahl — siehe [PostgreSQL auf Kubernetes – Best Practices](../../docs/postgres-as-statefulset.html).
 
 Erstelle eine Datei `postgres-deployment.yaml`. Das offizielle PostgreSQL-Image führt automatisch alle `.sql`-Dateien im Verzeichnis `/docker-entrypoint-initdb.d/` beim ersten Start aus.
 
@@ -142,7 +142,7 @@ spec:
 ```
 
 ```bash
-oc apply -f postgres-deployment.yaml
+kubectl apply -f postgres-deployment.yaml
 ```
 
 ### 5. Service erstellen
@@ -161,7 +161,7 @@ spec:
 ```
 
 ```bash
-oc apply -f postgres-service.yaml
+kubectl apply -f postgres-service.yaml
 ```
 
 ### 6. Prüfung
@@ -169,8 +169,8 @@ oc apply -f postgres-service.yaml
 Prüfe, ob der PostgreSQL-Pod läuft und die Tabellen angelegt wurden:
 
 ```bash
-oc get pods
-oc logs <postgres-pod-name>
+kubectl get pods
+kubectl logs <postgres-pod-name>
 ```
 
 In den Logs sollte die Ausführung des Init-Skripts sichtbar sein.
@@ -181,7 +181,7 @@ In den Logs sollte die Ausführung des Init-Skripts sichtbar sein.
 * [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/)
 * [ConfigMap als Volume einbinden](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume)
 * [PostgreSQL Docker Image](https://hub.docker.com/_/postgres) — Dokumentation der Umgebungsvariablen und Init-Skripte
-* [PostgreSQL auf Kubernetes – Best Practices](../docs/postgres-as-statefulset.html) — StatefulSet, Operatoren und produktionsreife Setups
+* [PostgreSQL auf Kubernetes – Best Practices](../../docs/postgres-as-statefulset.html) — StatefulSet, Operatoren und produktionsreife Setups
 
 ## 🤔 Reflexionsfragen
 
