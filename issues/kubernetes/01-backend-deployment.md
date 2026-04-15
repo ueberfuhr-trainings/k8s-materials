@@ -16,7 +16,7 @@ Als Entwickler möchte ich das Recipes-Backend als Container in Kubernetes deplo
 ## ✅ Definition of Done
 
 * [ ] Du hast ein Deployment für das Backend erstellt und angewendet.
-* [ ] Du hast den `ErrImagePull`-Fehler analysiert und ein Pull Secret erstellt.
+* [ ] Du hast den Pod-Status geprüft und ggf. einen `ErrImagePull`-Fehler mit einem Pull Secret behoben.
 * [ ] Du hast die Fehlermeldung beim `latest`-Tag analysiert und verstanden.
 * [ ] Du hast das Image-Tag auf `latest-dev` geändert und der Pod läuft erfolgreich.
 * [ ] Du hast einen Service und einen Ingress erstellt.
@@ -56,7 +56,7 @@ Wende das Manifest an:
 kubectl apply -f backend-deployment.yaml
 ```
 
-### 2. Fehler analysieren — Image Pull
+### 2. Pod-Status prüfen
 
 Prüfe den Status des Pods:
 
@@ -65,11 +65,11 @@ kubectl get pods
 kubectl describe pod <pod-name>
 ```
 
-Du wirst einen `ErrImagePull`- oder `ImagePullBackOff`-Status sehen. Docker Hub limitiert anonyme Zugriffe (Rate Limiting). Wir brauchen ein **Pull Secret** mit Docker Hub-Zugangsdaten.
+Falls der Pod im Status `ErrImagePull` oder `ImagePullBackOff` steht, liegt das am Rate Limiting von Docker Hub für anonyme Zugriffe. In diesem Fall musst Du ein **Pull Secret** erstellen (siehe Schritt 3). Falls der Pod das Image erfolgreich ziehen konnte, kannst Du Schritt 3 überspringen und direkt mit Schritt 4 fortfahren.
 
-### 3. Pull Secret erstellen und Deployment ergänzen
+### 3. *(Falls nötig)* Pull Secret erstellen und Deployment ergänzen
 
-Erstelle ein Pull Secret:
+Erstelle ein Pull Secret mit Deinen Docker Hub-Zugangsdaten:
 
 ```bash
 kubectl create secret docker-registry dockerhub-pull-secret \
