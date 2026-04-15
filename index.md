@@ -45,6 +45,8 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 
 ## Übungen (Kubernetes)
 
+> **Vorbereitung:** [Minikube-Setup für die Schulung](docs/minikube-setup.html) — Minikube installieren, Cluster starten und Namespace `schulung` einrichten
+
 1. [Backend-Deployment](issues/kubernetes/01-backend-deployment.html) — Deployment, Service und Ingress für das Backend erstellen
 2. [Frontend-Deployment](issues/kubernetes/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
 3. [Kreuzworträtsel](reflections/crossword-tag1.html) / [Quiz](reflections/quiz-tag1.html) — Wiederholung
