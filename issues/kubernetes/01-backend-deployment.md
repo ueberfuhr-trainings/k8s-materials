@@ -154,7 +154,7 @@ metadata:
   name: recipes-backend
 spec:
   rules:
-    - host: recipes-backend.<cluster-domain>
+    - host: recipes-backend.127.0.0.1.nip.io
       http:
         paths:
           - path: /
@@ -166,18 +166,28 @@ spec:
                   number: 8080
 ```
 
-> **Hinweis:** Ersetze `<cluster-domain>` durch die Domain deines Clusters (z.B. `127.0.0.1.nip.io` bei lokalen Setups oder die Domain deines Cloud-Providers). Dein Cluster benötigt einen [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) (z.B. NGINX Ingress Controller).
+> **Hinweis:** Wir verwenden hier [nip.io](https://nip.io) — einen DNS-Dienst, der Hostnamen automatisch auf die eingebettete IP-Adresse auflöst. `recipes-backend.127.0.0.1.nip.io` wird also zu `127.0.0.1` aufgelöst. Dein Cluster benötigt einen [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) — bei Minikube ist dieser bereits über das Addon `ingress` aktiviert (siehe [Minikube-Setup](../../docs/minikube-setup.html)).
 
 ```bash
 kubectl apply -f backend-ingress.yaml
 kubectl get ingress recipes-backend
 ```
 
-Teste die API:
+### 8. Ingress testen
+
+Damit der Ingress lokal erreichbar ist, muss `minikube tunnel` in einem **separaten Terminal** laufen:
 
 ```bash
-curl -s http://<ingress-host>/recipes | jq
+minikube tunnel
 ```
+
+Teste dann die API:
+
+```bash
+curl -s http://recipes-backend.127.0.0.1.nip.io/recipes | jq
+```
+
+Die URL `http://recipes-backend.127.0.0.1.nip.io/recipes` kannst Du auch direkt im Browser öffnen.
 
 ## 📚 Selbstlernmaterial
 

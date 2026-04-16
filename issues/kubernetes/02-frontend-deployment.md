@@ -25,19 +25,19 @@ Als Entwickler möchte ich das Recipes-Frontend in Kubernetes deployen und mit d
 
 ### 1. Frontend deployen
 
-Erstelle ein Deployment, einen Service und einen Ingress für das Frontend — analog zum Backend aus Übung 1. Verwende das Image `ralfueberfuhr/recipes-frontend:latest` mit dem Container-Port `8080`.
+Erstelle ein Deployment, einen Service und einen Ingress für das Frontend — analog zum Backend aus Übung 1. Verwende das Image `ralfueberfuhr/recipes-frontend:latest` mit dem Container-Port `8080`. Verwende als Ingress-Host `recipes-frontend.127.0.0.1.nip.io`.
 
 Wende die Manifeste an und prüfe, ob der Pod läuft.
 
 ### 2. Fehler im Browser analysieren
 
-Öffne die Frontend-URL im Browser. Öffne die **Developer Tools** (F12) und wechsle zum **Network**-Tab. Du wirst sehen, dass das Frontend versucht, das Backend unter einer falschen URL zu erreichen (Standard: `http://localhost:3000`).
+Stelle sicher, dass `minikube tunnel` in einem separaten Terminal läuft (siehe Übung 1). Öffne dann `http://recipes-frontend.127.0.0.1.nip.io` im Browser. Öffne die **Developer Tools** (F12) und wechsle zum **Network**-Tab. Du wirst sehen, dass das Frontend versucht, das Backend unter einer falschen URL zu erreichen (Standard: `http://localhost:3000`).
 
 ### 3. Umgebungsvariable setzen
 
 Das Frontend benötigt die Umgebungsvariable `API_BASE_URL`, um die korrekte Backend-URL zu kennen.
 
-Recherchiere in der [Kubernetes-Dokumentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/), wie Umgebungsvariablen in einem Container-Spec definiert werden, und setze `API_BASE_URL` auf die URL des Backend-Services (die Ingress-URL aus Übung 1).
+Recherchiere in der [Kubernetes-Dokumentation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/), wie Umgebungsvariablen in einem Container-Spec definiert werden, und setze `API_BASE_URL` auf die Ingress-URL des Backends aus Übung 1 (`http://recipes-backend.127.0.0.1.nip.io`).
 
 Wende das geänderte Manifest an und prüfe im Browser, ob das Frontend jetzt korrekt mit dem Backend kommuniziert.
 
