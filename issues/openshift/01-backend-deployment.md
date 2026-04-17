@@ -183,9 +183,7 @@ curl -s https://<route-url>/recipes | jq
 
 ## 🤔 Reflexionsfragen
 
-* Warum ist der Pod mit dem `latest`-Tag fehlgeschlagen?
 * Wie ist der Zusammenhang zwischen einem Deployment und einem Pod?
-* Warum braucht man einen Service, obwohl der Pod schon läuft? Welche Antwort erhalten wir, wenn der Pod gestoppt ist?
+* Wozu verwenden wir einen Service?
 * Welche Rolle spielt die Route in OpenShift?
-* Was passiert mit den Daten in der H2-Datenbank, wenn der Pod neu gestartet wird?
-* Was ist die `imagePullPolicy` und welcher Wert gilt standardmäßig? Welche anderen Werte gibt es, und wann ist welcher sinnvoll?
+* Welche Antwort erhalten wir, wenn kein Pod läuft?

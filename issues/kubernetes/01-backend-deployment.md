@@ -199,9 +199,7 @@ Die URL `http://recipes-backend.127.0.0.1.nip.io/recipes` kannst Du auch direkt 
 
 ## 🤔 Reflexionsfragen
 
-* Warum ist der Pod mit dem `latest`-Tag fehlgeschlagen?
 * Wie ist der Zusammenhang zwischen einem Deployment und einem Pod?
-* Warum braucht man einen Service, obwohl der Pod schon läuft? Welche Antwort erhalten wir, wenn der Pod gestoppt ist?
-* Welche Rolle spielt der Ingress in Kubernetes? Was ist der Unterschied zu einem Service vom Typ `LoadBalancer` oder `NodePort`?
-* Was passiert mit den Daten in der H2-Datenbank, wenn der Pod neu gestartet wird?
-* Was ist die `imagePullPolicy` und welcher Wert gilt standardmäßig? Welche anderen Werte gibt es, und wann ist welcher sinnvoll?
+* Wozu verwenden wir einen Service?
+* Welche Rolle spielt der Ingress in Kubernetes?
+* Welche Antwort erhalten wir, wenn kein Pod läuft?
