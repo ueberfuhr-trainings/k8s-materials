@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Übung 7: Helm Charts"
+title: "Übung 8: Helm Charts"
 ---
 
 # Anwendung als Helm Charts paketieren
@@ -42,10 +42,14 @@ oc delete route recipes-backend recipes-frontend
 oc delete configmap frontend-config postgres-config postgres-init-sql
 oc delete secret postgres-secret
 
+# PersistentVolumeClaim
+oc delete pvc postgres-data
+
 # Prüfen, ob alles weg ist
 oc get all
 oc get configmap
 oc get secret
+oc get pvc
 ```
 
 ### 2. Chart-Grundgerüste erzeugen

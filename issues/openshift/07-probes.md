@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Übung 6: Liveness- und Readiness-Probes"
+title: "Übung 7: Liveness- und Readiness-Probes"
 ---
 
 # Liveness- und Readiness-Probes konfigurieren

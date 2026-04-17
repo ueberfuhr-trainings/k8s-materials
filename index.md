@@ -40,8 +40,9 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 3. [ConfigMaps verwenden](issues/openshift/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
 4. [PostgreSQL-Datenbank](issues/openshift/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
 5. [Backend auf PostgreSQL umschalten](issues/openshift/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
-6. [Liveness- und Readiness-Probes](issues/openshift/06-probes.html) — Health Checks für Backend, Frontend und Datenbank
-7. [Helm Charts](issues/openshift/07-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+6. [Persistent Volumes](issues/openshift/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
+7. [Liveness- und Readiness-Probes](issues/openshift/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
+8. [Helm Charts](issues/openshift/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
 
 ## Übungen (Kubernetes)
 
@@ -53,5 +54,6 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 3. [ConfigMaps verwenden](issues/kubernetes/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
 4. [PostgreSQL-Datenbank](issues/kubernetes/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
 5. [Backend auf PostgreSQL umschalten](issues/kubernetes/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
-6. [Liveness- und Readiness-Probes](issues/kubernetes/06-probes.html) — Health Checks für Backend, Frontend und Datenbank
-7. [Helm Charts](issues/kubernetes/07-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+6. [Persistent Volumes](issues/kubernetes/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
+7. [Liveness- und Readiness-Probes](issues/kubernetes/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
+8. [Helm Charts](issues/kubernetes/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen

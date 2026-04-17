@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Übung 7: Helm Charts"
+title: "Übung 8: Helm Charts"
 ---
 
 # Anwendung als Helm Charts paketieren
@@ -42,10 +42,14 @@ kubectl delete ingress recipes-backend recipes-frontend
 kubectl delete configmap frontend-config postgres-config postgres-init-sql
 kubectl delete secret postgres-secret
 
+# PersistentVolumeClaim
+kubectl delete pvc postgres-data
+
 # Prüfen, ob alles weg ist
 kubectl get all
 kubectl get configmap
 kubectl get secret
+kubectl get pvc
 ```
 
 ### 2. Chart-Grundgerüste erzeugen
