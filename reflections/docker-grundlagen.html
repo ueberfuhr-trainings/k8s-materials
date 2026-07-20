@@ -112,7 +112,7 @@
     <h1 class="text-4xl font-extrabold text-white mb-2 tracking-tight">Docker <span class="text-[#ff5401]">Grundlagen-Check</span></h1>
     <p class="text-neutral-500">Auffrischung der Container-Basics vor dem Kubernetes-Kurs</p>
     <div class="mt-4 flex justify-between items-center text-xs text-neutral-500 mb-1">
-      <span id="question-counter">Frage 1 von 15</span>
+      <span id="question-counter">Frage 1 von 16</span>
       <span id="score-counter">Punkte: 0</span>
     </div>
     <div class="h-2 w-full bg-[#1e1e1e] rounded-full overflow-hidden border border-[#333333]">
@@ -200,394 +200,170 @@
 
   const questions = [
     {
+      description: "In Docker – und später in Kubernetes – begegnen dir ständig zwei Begriffe: Images und Container.",
+      question: "Was ist der Unterschied zwischen einem Image und einem Container?",
+      options: [
+        { text: "Ein Image ist eine unveränderliche Vorlage, ein Container eine laufende Instanz davon.", correct: true, feedback: "Richtig! Aus einem Image lassen sich beliebig viele gleichartige Container starten – die Grundlage jeder Skalierung." },
+        { text: "Ein Container ist die eigentliche Vorlage, aus der beim Build die verschiedenen Images abgeleitet und anschließend in die Registry geschoben werden.", correct: false, feedback: "Genau andersherum: Das Image ist die Vorlage, der Container die laufende Instanz." },
+        { text: "Die beiden Begriffe sind austauschbar und meinen dasselbe.", correct: false, feedback: "Nein, es sind zwei klar getrennte Konzepte: Bauartefakt vs. laufende Instanz." },
+        { text: "Ein Image existiert nur in der Cloud, ein Container läuft nur lokal auf dem Rechner.", correct: false, feedback: "Beides kann sowohl lokal als auch remote existieren." }
+      ]
+    },
+    {
+      description: "Ein Container durchläuft während seines Lebens verschiedene Zustände.",
+      question: "Was passiert mit einem Container, dessen Hauptprozess sich beendet?",
+      options: [
+        { text: "Er stoppt (Status 'Exited') und existiert weiter, bis er entfernt wird – von selbst startet kein neuer.", correct: true, feedback: "Richtig! Der Container-Lebenszyklus hängt am Hauptprozess (PID 1). Automatische Neustarts übernimmt erst eine Restart-Policy – in Kubernetes ein Controller." },
+        { text: "Der Container läuft im Leerlauf einfach weiter und wartet im Hintergrund darauf, dass ihm neue Aufgaben oder Requests zugewiesen werden.", correct: false, feedback: "Nein – endet der Hauptprozess, endet der Container." },
+        { text: "Er wird sofort automatisch neu gestartet.", correct: false, feedback: "Nur mit einer Restart-Policy. Ohne bleibt er im gestoppten Zustand." },
+        { text: "Er wird automatisch gelöscht und hinterlässt keine Spuren.", correct: false, feedback: "Nur wenn er ausdrücklich mit einer 'nach Ende entfernen'-Option gestartet wurde." }
+      ]
+    },
+    {
+      description: "Ein Container nimmt zur Laufzeit Änderungen an seinem Dateisystem vor, wird verworfen und neu aus dem Image erstellt – die Änderungen sind weg.",
+      question: "Welches Grundprinzip erklärt dieses Verhalten?",
+      options: [
+        { text: "Das Schreib-Dateisystem eines Containers ist flüchtig – es lebt und stirbt mit dem Container.", correct: true, feedback: "Richtig! Container gelten als kurzlebig und ersetzbar. Zustand gehört in Volumes oder externe Dienste." },
+        { text: "Docker löscht aus Sicherheitsgründen nach jedem Lauf automatisch sämtliche Dateien, um zu verhindern, dass sensible Daten im Container zurückbleiben.", correct: false, feedback: "Docker löscht nichts aktiv – ein neu erstellter Container startet einfach wieder vom Image-Zustand." },
+        { text: "Der Container hatte schlicht zu wenig Speicherplatz.", correct: false, feedback: "Nein, das Verhalten liegt am flüchtigen Dateisystem, nicht am Speicher." },
+        { text: "Das zugrunde liegende Image war vermutlich beschädigt.", correct: false, feedback: "Nein, das ist völlig normales, erwartetes Verhalten." }
+      ]
+    },
+    {
+      description: "Eine Web-Anwendung soll bei Lastspitzen einfach durch mehr Instanzen skaliert werden.",
+      question: "Warum ist es dafür wichtig, dass die Anwendung zustandslos (stateless) ist?",
+      options: [
+        { text: "Weil dann jede Instanz jeden Request bearbeiten kann und man beliebig hoch- und runterskalieren kann.", correct: true, feedback: "Richtig! Zustandslosigkeit ist die Voraussetzung für horizontale Skalierung und Selbstheilung. Sitzungsdaten gehören in externe Speicher (DB, Cache)." },
+        { text: "Weil zustandslose Anwendungen grundsätzlich weniger CPU und Arbeitsspeicher verbrauchen und deshalb mehr Instanzen auf dieselbe Hardware passen.", correct: false, feedback: "Das ist kein direkter Zusammenhang." },
+        { text: "Weil man dann gar keine Datenbank mehr benötigt.", correct: false, feedback: "Nein – der Zustand wird nur ausgelagert, nicht abgeschafft." },
+        { text: "Weil zustandslose Container keine Umgebungsvariablen mehr brauchen.", correct: false, feedback: "Kein Zusammenhang – Konfiguration per Umgebungsvariable bleibt unabhängig davon sinnvoll." }
+      ]
+    },
+    {
+      description: "Eine Datenbank im Container speichert ihre Daten standardmäßig im Container-Dateisystem.",
+      question: "Wie stellt man sicher, dass die Daten das Ersetzen oder Löschen des Containers überleben?",
+      options: [
+        { text: "Mit einem Volume – es speichert Daten außerhalb des Container-Lebenszyklus.", correct: true, feedback: "Richtig! Volumes sind der Standardweg für persistente Daten – in Kubernetes begegnen sie dir als PersistentVolumes wieder." },
+        { text: "Man muss die Daten vor jedem Löschen manuell mit einem Export-Werkzeug sichern und nach dem Neustart wieder einspielen – eine andere Möglichkeit gibt es nicht.", correct: false, feedback: "Manuelle Exports sind umständlich. Volumes sind die eingebaute Lösung." },
+        { text: "Docker erstellt vor dem Löschen automatisch ein vollständiges Backup.", correct: false, feedback: "Nein, Docker sichert nichts automatisch. Ohne Volume sind die Daten weg." },
+        { text: "Die Daten bleiben einfach im Image erhalten und sind wieder da.", correct: false, feedback: "Falsch – Laufzeit-Änderungen werden nicht ins Image zurückgeschrieben." }
+      ]
+    },
+    {
+      description: "Ein Backend-Container muss eine Datenbank in einem anderen Container erreichen.",
+      question: "Wie finden sich zwei Container in einem gemeinsamen Netzwerk gegenseitig?",
+      options: [
+        { text: "Über den Container-/Service-Namen als Hostname – ein eingebauter DNS-Dienst löst ihn auf.", correct: true, feedback: "Richtig! Dieses Prinzip 'stabiler Name statt fester IP' ist genau das, was in Kubernetes ein Service leistet." },
+        { text: "Über die IP-Adresse des Host-Rechners zusammen mit den nach außen gemappten Ports, die man vorher pro Container manuell festlegen und dokumentieren muss.", correct: false, feedback: "Möglich, aber fragil und nicht der empfohlene Weg für Container-zu-Container-Kommunikation." },
+        { text: "Gar nicht – jeder Container ist grundsätzlich vollständig isoliert.", correct: false, feedback: "Container in einem gemeinsamen Netzwerk können sehr wohl miteinander kommunizieren." },
+        { text: "Über eine direkte Shared-Memory-Verbindung zwischen den Containern.", correct: false, feedback: "Container kommunizieren über Netzwerkprotokolle, nicht über Shared Memory." }
+      ]
+    },
+    {
       description: "Die 12-Factor-App-Methodik beschreibt Best Practices für moderne Cloud-Anwendungen.",
       question: "Wie sollte eine 12-Factor-App laut Faktor III ('Config') ihre Konfiguration erhalten?",
       options: [
-        {
-          text: "Über Umgebungsvariablen, die von außen gesetzt werden.",
-          correct: true,
-          feedback: "Richtig! Umgebungsvariablen trennen Konfiguration sauber vom Code und lassen sich pro Deployment ändern."
-        },
-        {
-          text: "Über eine fest eingebettete Konfigurationsdatei im Container-Image.",
-          correct: false,
-          feedback: "Nein, das würde bedeuten, dass pro Umgebung (Dev, Staging, Prod) ein eigenes Image gebaut werden müsste."
-        },
-        {
-          text: "Über Kommandozeilenparameter, die beim Start des Containers übergeben werden.",
-          correct: false,
-          feedback: "CLI-Parameter sind möglich, aber nicht der empfohlene 12-Factor-Weg. Umgebungsvariablen sind sprach- und betriebssystemunabhängig."
-        },
-        {
-          text: "Über eine zentrale Datenbank, die alle Services bei jedem Request abfragen.",
-          correct: false,
-          feedback: "Das wäre ein Single Point of Failure und widerspricht dem 12-Factor-Prinzip."
-        }
+        { text: "Über Umgebungsvariablen, die von außen gesetzt werden.", correct: true, feedback: "Richtig! Umgebungsvariablen trennen Konfiguration sauber vom Code und lassen sich pro Deployment ändern." },
+        { text: "Über eine fest im Image eingebettete Konfigurationsdatei, die pro Umgebung angepasst und mitgebaut wird.", correct: false, feedback: "Nein – dann müsste pro Umgebung (Dev, Staging, Prod) ein eigenes Image gebaut werden." },
+        { text: "Über fest im Quellcode kodierte Werte, die beim Kompilieren gesetzt werden.", correct: false, feedback: "Das koppelt Konfiguration und Code und verhindert Umgebungswechsel ohne Neu-Build." },
+        { text: "Über eine zentrale Datenbank, die jeder Service bei jedem einzelnen Request erneut abfragt.", correct: false, feedback: "Das wäre ein Single Point of Failure und widerspricht dem 12-Factor-Prinzip." }
       ]
     },
     {
-      description: "Du möchtest einen Container im Hintergrund starten und ihm einen eindeutigen Namen geben.",
-      question: "Welcher Docker-CLI-Befehl ist dafür korrekt?",
+      description: "Nach der 12-Factor-Methodik behandelt eine App ihre Logs auf eine bestimmte Weise (Faktor XI, 'Logs').",
+      question: "Wohin sollte eine containerisierte Anwendung ihre Logs schreiben?",
       options: [
-        {
-          text: "docker run -d --name my-app nginx",
-          correct: true,
-          feedback: "Richtig! '-d' steht für 'detached' (Hintergrund) und '--name' vergibt einen Namen."
-        },
-        {
-          text: "docker start -d --name my-app nginx",
-          correct: false,
-          feedback: "'docker start' startet einen existierenden, gestoppten Container — er erstellt keinen neuen."
-        },
-        {
-          text: "docker create --background --name my-app nginx",
-          correct: false,
-          feedback: "'docker create' erstellt einen Container, startet ihn aber nicht. '--background' ist kein gültiger Flag."
-        },
-        {
-          text: "docker run --daemon --label my-app nginx",
-          correct: false,
-          feedback: "Es gibt kein '--daemon'-Flag. Der richtige Flag ist '-d'. '--label' setzt Metadaten, keinen Namen."
-        }
+        { text: "Als Event-Stream nach stdout/stderr – die Plattform sammelt sie ein und leitet sie weiter.", correct: true, feedback: "Richtig! So können Docker und Kubernetes die Logs zentral abgreifen. Die App verwaltet selbst keine Logdateien." },
+        { text: "In eine rotierende Logdatei innerhalb des Containers, die man per Cronjob aufräumt und zur Auswertung regelmäßig vom Node herunterkopiert.", correct: false, feedback: "Die wäre flüchtig, ginge mit dem Container verloren und ist schwer zentral auszuwerten." },
+        { text: "Direkt in eine fest verdrahtete zentrale Log-Datenbank.", correct: false, feedback: "Das koppelt die App zu eng an eine konkrete Infrastruktur." },
+        { text: "Logs sollten aus Performancegründen ganz deaktiviert werden.", correct: false, feedback: "Nein, Logs sind wichtig – entscheidend ist nur der Transportweg." }
       ]
     },
     {
-      description: "Dockerfiles beschreiben den Aufbau eines Container-Images Schicht für Schicht.",
-      question: "Welche Anweisung definiert den Befehl, der beim Start des Containers ausgeführt wird?",
+      description: "Eine Anwendung nutzt eine Datenbank – in der Entwicklung eine lokale, in Produktion eine gehostete.",
+      question: "Wie behandelt eine 12-Factor-App solche 'Backing Services' (Datenbanken, Caches, Queues)?",
       options: [
-        {
-          text: "CMD",
-          correct: true,
-          feedback: "Richtig! CMD definiert den Standard-Startbefehl. Er kann beim 'docker run' überschrieben werden."
-        },
-        {
-          text: "RUN",
-          correct: false,
-          feedback: "RUN wird zur Build-Zeit ausgeführt, nicht beim Container-Start."
-        },
-        {
-          text: "COPY",
-          correct: false,
-          feedback: "COPY kopiert Dateien ins Image, hat aber mit dem Startbefehl nichts zu tun."
-        },
-        {
-          text: "EXPOSE",
-          correct: false,
-          feedback: "EXPOSE dokumentiert einen Port, führt aber keinen Befehl aus."
-        }
+        { text: "Als angehängte Ressourcen, die per Konfiguration (z.B. eine Connection-URL) austauschbar sind – ohne Codeänderung.", correct: true, feedback: "Richtig! Dev- und Prod-Datenbank unterscheiden sich nur in der Konfiguration, der Code bleibt identisch." },
+        { text: "Sie werden fest in den Anwendungscode kompiliert, sodass für jede Datenbank oder jeden Cache eine eigene Programmversion gebaut und ausgeliefert werden muss.", correct: false, feedback: "Das verhindert den Wechsel zwischen Umgebungen ohne Neu-Build." },
+        { text: "Jeder Backing Service muss zwingend im selben Container laufen.", correct: false, feedback: "Nein, es sind eigenständige, über das Netzwerk erreichbare Dienste." },
+        { text: "Backing Services dürfen ausschließlich lokal betrieben werden.", correct: false, feedback: "Beides ist möglich – genau darum geht es bei der Austauschbarkeit." }
+      ]
+    },
+    {
+      description: "Ein Container läuft (Prozess gestartet), aber die Anwendung darin fährt noch hoch und nimmt noch keine Anfragen an.",
+      question: "Warum reicht 'der Container läuft' nicht aus, um Traffic auf ihn zu leiten?",
+      options: [
+        { text: "Weil 'gestartet' nicht gleich 'bereit' ist – ein Health Check prüft die tatsächliche Antwortbereitschaft.", correct: true, feedback: "Richtig! Genau diese Unterscheidung führt in Kubernetes zu Readiness- und Liveness-Probes." },
+        { text: "Doch, es reicht völlig – sobald der Container-Prozess gestartet ist, hat die Anwendung darin garantiert schon alle Verbindungen aufgebaut und ist sofort bereit.", correct: false, feedback: "Nein, Startvorgänge wie DB-Verbindungen oder das Laden von Caches brauchen Zeit." },
+        { text: "Weil ein laufender Container ohnehin nie Traffic bekommt.", correct: false, feedback: "Ohne Bereitschaftsprüfung bekäme er sogar zu früh Traffic." },
+        { text: "Weil Container generell keinen Netzwerkverkehr annehmen können.", correct: false, feedback: "Können sie – es geht um den richtigen Zeitpunkt der Bereitschaft." }
+      ]
+    },
+    {
+      description: "Ein Architekt überlegt, ob Anwendung und Datenbank in denselben Container gehören.",
+      question: "Warum trennt man Anwendung und Datenbank üblicherweise in getrennte Container?",
+      options: [
+        { text: "Weil man sie so unabhängig skalieren, aktualisieren und neu starten kann.", correct: true, feedback: "Richtig! Getrennte Lebenszyklen sind die Basis für gezielte Skalierung und einfache Updates." },
+        { text: "Weil ein Container technisch immer nur einen einzigen Prozess ausführen kann und das Betriebssystem im Container einen zweiten Prozess sofort beenden würde.", correct: false, feedback: "Technisch ginge mehr – es ist aber bewusst eine Best Practice, es nicht zu tun." },
+        { text: "Weil ein Container nicht genug Speicher für zwei Dienste hat.", correct: false, feedback: "Das ist keine technische Einschränkung." },
+        { text: "Es gibt keinen echten Grund – alles in einen Container ist einfacher.", correct: false, feedback: "Kurzfristig einfacher, langfristig problematisch bei Updates, Skalierung und Fehlersuche." }
+      ]
+    },
+    {
+      description: "Eine Anwendung besteht aus Frontend, Backend und einer rechenintensiven Bildverarbeitung. Nur die Bildverarbeitung ist unter Last überfordert.",
+      question: "Welchen Vorteil bietet es, jede Komponente als eigenes Image/Container zu betreiben?",
+      options: [
+        { text: "Man kann gezielt nur die überlastete Komponente hochskalieren.", correct: true, feedback: "Richtig! Modularität erlaubt gezielte, ressourcensparende Skalierung – ein Kernvorteil, den Kubernetes voll ausspielt." },
+        { text: "Man spart Arbeitsspeicher und Festplattenplatz, weil sich alle drei Container automatisch dasselbe Basis-Image teilen und es nur einmal vorgehalten wird.", correct: false, feedback: "Sie teilen nicht zwingend dasselbe Image – der Vorteil liegt in der unabhängigen Skalierbarkeit." },
+        { text: "Die Anwendung wird dadurch automatisch zustandslos.", correct: false, feedback: "Zustandslosigkeit ist eine Design-Entscheidung, keine Folge der Aufteilung." },
+        { text: "Man braucht dann keine Netzwerkverbindungen mehr zwischen den Teilen.", correct: false, feedback: "Im Gegenteil – die getrennten Teile kommunizieren über das Netzwerk." }
+      ]
+    },
+    {
+      description: "Ein Image wird in der CI einmal gebaut und dann unverändert durch Dev, Staging und Produktion gereicht – nur die Konfiguration ändert sich.",
+      question: "Warum baut man nicht pro Umgebung ein eigenes Image?",
+      options: [
+        { text: "Weil dasselbe unveränderliche Artefakt getestet und ausgeliefert wird – das schafft Dev-Prod-Parität.", correct: true, feedback: "Richtig! Ein Image ist immutable: einmal bauen, überall laufen lassen, nur die Config (z.B. Umgebungsvariablen) variiert." },
+        { text: "Weil Docker das Bauen mehrerer Images pro Projekt technisch verbietet und beim Push mit demselben Namen den vorherigen Build ohne Warnung überschreibt.", correct: false, feedback: "Verboten ist das nicht – es geht um Reproduzierbarkeit und Nachvollziehbarkeit." },
+        { text: "Weil ein pro Umgebung gebautes Image automatisch kleiner ausfällt.", correct: false, feedback: "Nein, die Größe hängt nicht von der Zielumgebung ab." },
+        { text: "Weil sich Images nach dem Bauen ohnehin nicht mehr starten lassen.", correct: false, feedback: "Doch – sie lassen sich starten, sie sind nur unveränderlich." }
+      ]
+    },
+    {
+      description: "Ein Dockerfile nutzt Multi-Stage Builds: Es gibt eine Build-Stage und eine schlanke finale Stage.",
+      code: `FROM maven:3.9 AS build
+COPY . /app
+RUN mvn -f /app/pom.xml package
+
+FROM eclipse-temurin:21-jre
+COPY --from=build /app/target/*.jar /app.jar
+CMD ["java", "-jar", "/app.jar"]`,
+      question: "Welchen Vorteil hat dieser Ansatz für das fertige Image?",
+      options: [
+        { text: "Das finale Image enthält nur JRE und JAR – ohne Maven, Quellcode oder Build-Artefakte.", correct: true, feedback: "Richtig! Multi-Stage Builds trennen Build- von Laufzeit-Umgebung. Kleinere Images starten schneller und haben eine geringere Angriffsfläche – relevant für schnelle Skalierung." },
+        { text: "Der Build wird deutlich schneller, weil Docker die beiden Stages parallel auf mehreren CPU-Kernen ausführt und die Ergebnisse am Ende zusammenführt.", correct: false, feedback: "Die Stages laufen sequenziell. Der Vorteil liegt in Größe und Sicherheit des finalen Images." },
+        { text: "Man braucht dadurch kein Java mehr auf dem Zielsystem.", correct: false, feedback: "Das gilt für Container generell (die JRE steckt im Image), nicht speziell für Multi-Stage Builds." },
+        { text: "Es ermöglicht, mehrere Anwendungen in einem Container zu betreiben.", correct: false, feedback: "Nein, damit hat Multi-Stage nichts zu tun." }
       ]
     },
     {
       description: "Ein Team pusht ein neues Image in eine Registry, ohne einen expliziten Tag anzugeben.",
-      question: "Welchen Tag erhält das Image automatisch — und warum ist das in der Praxis problematisch?",
+      question: "Welchen Tag erhält das Image automatisch – und warum ist das in der Praxis problematisch?",
       options: [
-        {
-          text: "'latest' — weil dieser Tag bei jedem Push überschrieben wird und so unklar ist, welche Version tatsächlich läuft.",
-          correct: true,
-          feedback: "Richtig! 'latest' ist kein Versionsversprechen, sondern einfach der Default-Tag. Ohne explizite Tags verliert man die Nachvollziehbarkeit."
-        },
-        {
-          text: "'v1.0' — Docker vergibt automatisch semantische Versionsnummern.",
-          correct: false,
-          feedback: "Nein, Docker vergibt keine automatischen Versionsnummern. Das muss manuell oder per CI/CD geschehen."
-        },
-        {
-          text: "'stable' — Docker markiert automatisch stabile Builds.",
-          correct: false,
-          feedback: "Es gibt keinen automatisch vergebenen 'stable'-Tag."
-        },
-        {
-          text: "Gar keinen Tag — das Image ist dann nicht auffindbar.",
-          correct: false,
-          feedback: "Falsch. Ohne expliziten Tag wird automatisch 'latest' verwendet."
-        }
+        { text: "'latest' – der Tag wird bei jedem Push überschrieben, dann ist unklar, welche Version läuft.", correct: true, feedback: "Richtig! 'latest' ist kein Versionsversprechen, sondern nur der Default-Tag. Ohne explizite Tags verliert man Nachvollziehbarkeit und reproduzierbare Deployments." },
+        { text: "'v1.0' – Docker erkennt die Version automatisch aus den Metadaten des Images und vergibt fortlaufend passende semantische Versionsnummern.", correct: false, feedback: "Nein, Docker vergibt keine automatischen Versionsnummern." },
+        { text: "'stable' – Docker markiert erfolgreich gebaute Images automatisch als stabil.", correct: false, feedback: "Es gibt keinen automatisch vergebenen 'stable'-Tag." },
+        { text: "Gar keinen Tag – das Image ist dann nicht auffindbar.", correct: false, feedback: "Falsch – ohne expliziten Tag wird automatisch 'latest' verwendet." }
       ]
     },
     {
       description: "In einer Container-Registry wird ein Image unter einem bestimmten Pfad gespeichert.",
       question: "Was beschreibt ein 'Repository' im Kontext einer Container-Registry?",
       options: [
-        {
-          text: "Eine Sammlung von Image-Versionen unter einem gemeinsamen Namen, z.B. 'mycompany/backend'.",
-          correct: true,
-          feedback: "Richtig! Ein Repository gruppiert alle Tags (Versionen) eines Images unter einem logischen Namen."
-        },
-        {
-          text: "Ein einzelner laufender Container auf einem Server.",
-          correct: false,
-          feedback: "Nein, ein Container ist eine laufende Instanz. Das Repository liegt in der Registry."
-        },
-        {
-          text: "Ein Git-Repository mit dem Quellcode der Anwendung.",
-          correct: false,
-          feedback: "Nicht im Registry-Kontext. Hier geht es um Image-Repositories, nicht um Source-Code."
-        },
-        {
-          text: "Ein Backup aller Docker-Volumes.",
-          correct: false,
-          feedback: "Volumes haben nichts mit der Registry zu tun."
-        }
-      ]
-    },
-    {
-      description: "Eine Datenbank im Container speichert ihre Daten standardmäßig innerhalb des Container-Dateisystems.",
-      question: "Was passiert mit den Daten, wenn der Container gelöscht wird — und wie verhindert man den Datenverlust?",
-      options: [
-        {
-          text: "Die Daten gehen verloren. Man verwendet Docker Volumes, um Daten außerhalb des Containers persistent zu speichern.",
-          correct: true,
-          feedback: "Richtig! Volumes überleben den Lebenszyklus eines Containers und sind der empfohlene Weg für persistente Daten."
-        },
-        {
-          text: "Docker erstellt automatisch ein Backup, bevor der Container gelöscht wird.",
-          correct: false,
-          feedback: "Nein, Docker sichert nichts automatisch. Ohne Volume sind die Daten weg."
-        },
-        {
-          text: "Die Daten bleiben im Image erhalten und sind beim nächsten Start wieder da.",
-          correct: false,
-          feedback: "Falsch. Änderungen zur Laufzeit werden nicht ins Image zurückgeschrieben."
-        },
-        {
-          text: "Man muss die Datenbank vor dem Löschen manuell exportieren — es gibt keine andere Lösung.",
-          correct: false,
-          feedback: "Manuelle Exports sind umständlich. Volumes sind die elegante, eingebaute Lösung."
-        }
-      ]
-    },
-    {
-      description: "Zwei Container — ein Backend und eine Datenbank — müssen miteinander kommunizieren.",
-      question: "Wie finden sich Container in einem benutzerdefinierten Docker-Netzwerk gegenseitig?",
-      options: [
-        {
-          text: "Über ihren Containernamen als Hostname — Docker stellt dafür einen eingebauten DNS-Dienst bereit.",
-          correct: true,
-          feedback: "Richtig! In einem benutzerdefinierten Netzwerk löst Docker Containernamen automatisch zu IP-Adressen auf."
-        },
-        {
-          text: "Über die IP-Adresse des Host-Rechners und gemappte Ports.",
-          correct: false,
-          feedback: "Das funktioniert zwar, ist aber fragil und nicht der empfohlene Weg für Container-zu-Container-Kommunikation."
-        },
-        {
-          text: "Gar nicht — jeder Container ist komplett isoliert und kann nicht mit anderen kommunizieren.",
-          correct: false,
-          feedback: "Container in einem gemeinsamen Netzwerk können sehr wohl kommunizieren."
-        },
-        {
-          text: "Über eine Shared-Memory-Verbindung zwischen den Containern.",
-          correct: false,
-          feedback: "Docker nutzt Netzwerkprotokolle, nicht Shared Memory, für Container-Kommunikation."
-        }
-      ]
-    },
-    {
-      description: "Ein Projekt besteht aus einem Frontend, einem Backend und einer Datenbank.",
-      question: "Welches Werkzeug eignet sich am besten, um alle drei Services mit einem einzigen Befehl zu starten und zu verknüpfen?",
-      options: [
-        {
-          text: "Docker Compose — über eine docker-compose.yml werden alle Services, Netzwerke und Volumes deklarativ definiert.",
-          correct: true,
-          feedback: "Richtig! Docker Compose orchestriert Multi-Container-Setups lokal mit einem einfachen 'docker compose up'."
-        },
-        {
-          text: "Ein Bash-Skript mit drei separaten 'docker run'-Befehlen.",
-          correct: false,
-          feedback: "Das funktioniert, ist aber fehleranfällig und schwer wartbar. Docker Compose ist der Standard dafür."
-        },
-        {
-          text: "Alle drei Anwendungen in ein einziges Docker-Image packen.",
-          correct: false,
-          feedback: "Das widerspricht dem Prinzip 'Ein Prozess pro Container' und erschwert Skalierung und Updates."
-        },
-        {
-          text: "Kubernetes — auch für lokale Entwicklung ist ein Cluster der richtige Ansatz.",
-          correct: false,
-          feedback: "Kubernetes ist für Produktion und größere Setups gedacht. Für lokale Entwicklung ist Docker Compose deutlich einfacher."
-        }
-      ]
-    },
-    {
-      description: "In einer docker-compose.yml steht ein Service mit einer 'depends_on'-Angabe.",
-      question: "Was garantiert 'depends_on' — und was nicht?",
-      options: [
-        {
-          text: "Es garantiert die Startreihenfolge der Container, aber NICHT, dass der abhängige Service tatsächlich bereit ist.",
-          correct: true,
-          feedback: "Richtig! Der Datenbank-Container kann gestartet sein, aber die DB akzeptiert vielleicht noch keine Verbindungen. Dafür braucht man Health Checks."
-        },
-        {
-          text: "Es garantiert, dass der abhängige Service vollständig hochgefahren und bereit ist.",
-          correct: false,
-          feedback: "Nein, 'depends_on' allein wartet nur auf den Container-Start, nicht auf die Anwendungsbereitschaft."
-        },
-        {
-          text: "Es erstellt automatisch ein gemeinsames Netzwerk zwischen den Services.",
-          correct: false,
-          feedback: "Das Netzwerk wird von Compose ohnehin automatisch erstellt, unabhängig von 'depends_on'."
-        },
-        {
-          text: "Es sorgt dafür, dass beide Services im selben Container laufen.",
-          correct: false,
-          feedback: "Nein, jeder Service in Compose läuft in seinem eigenen Container."
-        }
-      ]
-    },
-    {
-      description: "Docker bietet eine HEALTHCHECK-Anweisung im Dockerfile an.",
-      question: "Was bewirkt ein HEALTHCHECK und wofür wird er verwendet?",
-      options: [
-        {
-          text: "Er führt periodisch einen Befehl aus und markiert den Container als 'healthy' oder 'unhealthy' — z.B. für Abhängigkeitssteuerung in Compose.",
-          correct: true,
-          feedback: "Richtig! Mit 'depends_on' und 'condition: service_healthy' kann Compose auf echte Bereitschaft warten."
-        },
-        {
-          text: "Er startet den Container automatisch neu, wenn die Anwendung abstürzt.",
-          correct: false,
-          feedback: "Neustarts macht die Restart-Policy, nicht der Health Check. Der HEALTHCHECK meldet nur den Status."
-        },
-        {
-          text: "Er prüft bei 'docker build', ob das Image fehlerfrei gebaut wurde.",
-          correct: false,
-          feedback: "Der HEALTHCHECK läuft zur Laufzeit, nicht zur Build-Zeit."
-        },
-        {
-          text: "Er überwacht die CPU- und RAM-Auslastung des Containers.",
-          correct: false,
-          feedback: "Nein, ein HEALTHCHECK führt einen frei definierbaren Befehl aus (z.B. curl oder pg_isready), aber überwacht nicht die Systemressourcen."
-        }
-      ]
-    },
-    {
-      description: "In Docker gibt es zwei zentrale Begriffe: Images und Container.",
-      question: "Was ist der Unterschied zwischen einem Docker-Image und einem Docker-Container?",
-      options: [
-        {
-          text: "Ein Image ist eine unveränderliche Vorlage (wie eine Klasse). Ein Container ist eine laufende Instanz davon (wie ein Objekt).",
-          correct: true,
-          feedback: "Richtig! Aus einem Image können beliebig viele Container gestartet werden."
-        },
-        {
-          text: "Ein Container ist die Vorlage, aus der Images erzeugt werden.",
-          correct: false,
-          feedback: "Genau andersherum: Das Image ist die Vorlage, der Container die Instanz."
-        },
-        {
-          text: "Es gibt keinen Unterschied — die Begriffe sind austauschbar.",
-          correct: false,
-          feedback: "Nein, es sind zwei klar unterschiedliche Konzepte."
-        },
-        {
-          text: "Ein Image existiert nur in der Cloud, ein Container nur lokal.",
-          correct: false,
-          feedback: "Beides kann sowohl lokal als auch remote existieren."
-        }
-      ]
-    },
-    {
-      description: "Ein Container wurde mit 'docker run' gestartet und die Anwendung darin beendet sich.",
-      question: "Welchen Status hat der Container danach — und was bedeutet das?",
-      options: [
-        {
-          text: "'Exited' — der Container existiert noch, läuft aber nicht mehr. Er kann mit 'docker start' neu gestartet oder mit 'docker rm' entfernt werden.",
-          correct: true,
-          feedback: "Richtig! Gestoppte Container belegen weiterhin Speicherplatz und können mit 'docker ps -a' angezeigt werden."
-        },
-        {
-          text: "Der Container wird automatisch gelöscht und ist verschwunden.",
-          correct: false,
-          feedback: "Nur mit dem Flag '--rm' wird ein Container nach dem Stoppen automatisch entfernt."
-        },
-        {
-          text: "'Paused' — der Container wartet auf neue Eingaben.",
-          correct: false,
-          feedback: "'Paused' ist ein eigener Status, der durch 'docker pause' ausgelöst wird."
-        },
-        {
-          text: "Der Container startet sich automatisch neu.",
-          correct: false,
-          feedback: "Nur mit einer passenden Restart-Policy (z.B. '--restart always') würde er neu starten."
-        }
-      ]
-    },
-    {
-      description: "Ein Architekt überlegt, ob Anwendung und Datenbank in denselben Container gehören.",
-      question: "Warum sollte man Anwendung und Datenbank in getrennte Container aufteilen?",
-      options: [
-        {
-          text: "Weil man sie unabhängig skalieren, updaten und neustarten kann — und das dem 'Ein Prozess pro Container'-Prinzip entspricht.",
-          correct: true,
-          feedback: "Richtig! Getrennte Container ermöglichen unabhängige Lebenszyklen, bessere Wartbarkeit und gezielte Skalierung."
-        },
-        {
-          text: "Weil Docker technisch nur einen einzigen Prozess pro Container erlaubt.",
-          correct: false,
-          feedback: "Technisch kann ein Container mehrere Prozesse haben. Es ist aber eine Best Practice, es nicht zu tun."
-        },
-        {
-          text: "Weil Container nicht genug Speicher für zwei Anwendungen haben.",
-          correct: false,
-          feedback: "Das ist keine technische Einschränkung. Container können beliebig viel Speicher nutzen."
-        },
-        {
-          text: "Es gibt keinen Grund zur Trennung — alles in einen Container ist einfacher.",
-          correct: false,
-          feedback: "Kurzfristig vielleicht, aber langfristig entstehen Probleme bei Updates, Skalierung und Fehlersuche."
-        }
-      ]
-    },
-    {
-      description: "Ein Entwickler startet einen Container mit 'docker run --rm ...', nimmt zur Laufzeit Änderungen am Dateisystem vor und stoppt den Container. Beim erneuten Starten sind alle Änderungen verschwunden.",
-      question: "Welches Prinzip der Container-Welt erklärt dieses Verhalten?",
-      options: [
-        {
-          text: "Container sind zustandslos (stateless) konzipiert — Daten im Container-Dateisystem sind flüchtig und gehen beim Neuerstellen verloren.",
-          correct: true,
-          feedback: "Richtig! Zustandslosigkeit ist ein Kernprinzip. Persistenter Zustand gehört in Volumes, Datenbanken oder externe Speicher."
-        },
-        {
-          text: "Der Container hatte nicht genug Festplattenplatz.",
-          correct: false,
-          feedback: "Das hat nichts mit Speicherplatz zu tun, sondern mit dem flüchtigen Container-Dateisystem."
-        },
-        {
-          text: "Docker löscht nach jedem Neustart automatisch alle Dateien zur Sicherheit.",
-          correct: false,
-          feedback: "Docker löscht nichts aktiv. Aber wenn ein Container neu erstellt wird (nicht nur neugestartet), startet er vom Image-Zustand."
-        },
-        {
-          text: "Die Festplatte des Host-Systems war voll.",
-          correct: false,
-          feedback: "Das ist ein anderes Problem und nicht der Grund für das beschriebene Verhalten."
-        }
-      ]
-    },
-    {
-      description: "Ein Dockerfile nutzt Multi-Stage Builds: Es gibt eine Build-Stage und eine finale Stage.",
-      code: "FROM maven:3.9 AS build\nCOPY . /app\nRUN mvn -f /app/pom.xml package\n\nFROM eclipse-temurin:21-jre\nCOPY --from=build /app/target/*.jar /app.jar\nCMD [\"java\", \"-jar\", \"/app.jar\"]",
-      question: "Welchen Vorteil hat dieser Ansatz?",
-      options: [
-        {
-          text: "Das finale Image enthält nur die JRE und die JAR-Datei — ohne Maven, Quellcode oder Build-Artefakte. Das macht es deutlich kleiner und sicherer.",
-          correct: true,
-          feedback: "Richtig! Multi-Stage Builds trennen Build-Umgebung von Laufzeit-Umgebung. Das reduziert die Angriffsfläche und die Image-Größe."
-        },
-        {
-          text: "Der Build wird dadurch schneller, weil Docker beide Stages parallel ausführt.",
-          correct: false,
-          feedback: "Die Stages werden sequenziell ausgeführt. Der Vorteil liegt in der Größe und Sicherheit des finalen Images."
-        },
-        {
-          text: "Man braucht kein Java mehr auf dem Zielsystem installiert.",
-          correct: false,
-          feedback: "Das gilt für Docker generell (die JRE ist im Image). Das ist kein spezifischer Vorteil von Multi-Stage Builds."
-        },
-        {
-          text: "Es ermöglicht, mehrere Anwendungen in einem Container zu betreiben.",
-          correct: false,
-          feedback: "Nein, Multi-Stage Builds haben nichts mit der Anzahl der Prozesse im Container zu tun."
-        }
+        { text: "Eine Sammlung von Image-Versionen unter einem gemeinsamen Namen, z.B. 'mycompany/backend'.", correct: true, feedback: "Richtig! Ein Repository gruppiert alle Tags (Versionen) eines Images unter einem logischen Namen." },
+        { text: "Ein Git-Repository, das den Quellcode samt Dockerfile enthält und aus dem die Registry bei jedem Commit automatisch ein neues Image baut.", correct: false, feedback: "Nicht im Registry-Kontext – hier geht es um Image-Repositories, nicht um Source-Code." },
+        { text: "Ein einzelner laufender Container auf einem Server.", correct: false, feedback: "Nein, ein Container ist eine laufende Instanz. Das Repository liegt in der Registry." },
+        { text: "Ein Backup sämtlicher Docker-Volumes eines Hosts.", correct: false, feedback: "Volumes haben nichts mit der Registry zu tun." }
       ]
     }
   ];
