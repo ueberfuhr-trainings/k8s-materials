@@ -119,6 +119,7 @@ oc logs <pod-name> --previous       # Logs des vorherigen Containers (nach Resta
 oc exec -it <pod-name> -- /bin/sh
 
 # Befehl in einem Pod ausführen
+# (z.B. "env" zur Anzeige von Umgebungsvariablen)
 oc exec <pod-name> -- env
 
 # Port-Forwarding (lokaler Zugriff auf Pod)

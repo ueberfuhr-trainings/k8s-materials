@@ -368,16 +368,23 @@
 <script>
     const FALLBACK_DATA = {
         "title": "Kubernetes Wiederholung Tag 1",
-        "solution": "RESTAURANT",
+        "solution": "ORCHESTRIERUNG",
         "questions": [
-            {"clue": "Kleinste deploybare Einheit in Kubernetes<br><small style='color:#888'>(Im Restaurant: das Tablett mit dem fertigen Gericht)</small>", "answer": "POD"},
-            {"clue": "Beschreibt den Soll-Zustand an Pods inkl. Anzahl der Replicas<br><small style='color:#888'>(Im Restaurant: das Rezept — 'Davon immer 3 Portionen bereithalten')</small>", "answer": "DEPLOYMENT"},
-            {"clue": "Stabiler Netzwerk-Endpunkt für eine Gruppe von Pods<br><small style='color:#888'>(Im Restaurant: die Durchreiche — egal welcher Koch)</small>", "answer": "SERVICE"},
-            {"clue": "Macht einen Service von außen erreichbar (OpenShift)<br><small style='color:#888'>(Im Restaurant: die Eingangstür mit dem Namensschild)</small>", "answer": "ROUTE"},
-            {"clue": "oc _____ -f — Gewünschten Zustand an den Cluster übergeben<br><small style='color:#888'>(Im Restaurant: Bestellzettel unter der Bürotür durchschieben)</small>", "answer": "APPLY"},
-            {"clue": "Sorgt dafür, dass immer die gewünschte Anzahl Pods läuft<br><small style='color:#888'>(Im Restaurant: der Küchenchef, der ständig durchzählt)</small>", "answer": "REPLICASET"},
-            {"clue": "Gesamte Infrastruktur aus Control Plane und Worker Nodes<br><small style='color:#888'>(Im Restaurant: Gebäude, Küche und Personal)</small>", "answer": "CLUSTER"},
-            {"clue": "Maschine im Cluster, auf der Pods ausgeführt werden<br><small style='color:#888'>(Im Restaurant: ein Küchenarbeitsplatz mit Herd)</small>", "answer": "NODE"}
+            {"clue": "Kleinste deploybare Einheit in Kubernetes", "answer": "POD"},
+            {"clue": "Beschreibt den Soll-Zustand an Pods inkl. Anzahl der Replicas", "answer": "DEPLOYMENT"},
+            {"clue": "Stabiler Netzwerk-Endpunkt für eine Gruppe von Pods", "answer": "SERVICE"},
+            {"clue": "Macht einen Service von außen erreichbar (OpenShift)", "answer": "ROUTE"},
+            {"clue": "oc _____ -f — Gewünschten Zustand an den Cluster übergeben", "answer": "APPLY"},
+            {"clue": "Sorgt dafür, dass immer die gewünschte Anzahl Pods läuft", "answer": "REPLICASET"},
+            {"clue": "Gesamte Infrastruktur aus Control Plane und Worker Nodes", "answer": "CLUSTER"},
+            {"clue": "Maschine im Cluster, auf der Pods ausgeführt werden", "answer": "NODE"},
+            {"clue": "Laufende, isolierte Instanz eines Images (Docker-Grundlage)", "answer": "CONTAINER"},
+            {"clue": "Agent auf jedem Node, der die Container startet und überwacht", "answer": "KUBELET"},
+            {"clue": "Control-Plane-Komponente, die neue Pods den Nodes zuweist", "answer": "SCHEDULER"},
+            {"clue": "Verteilte Key-Value-Datenbank — das 'Gedächtnis' des Clusters", "answer": "ETCD"},
+            {"clue": "In Kubernetes der isolierte Bereich (bei OpenSHift: Project)", "answer": "NAMESPACE"},
+            {"clue": "Zentraler Ablageort für Container-Images (z.B. Docker Hub)", "answer": "REGISTRY"},
+            {"clue": "YAML-Datei, die eine Ressource deklarativ beschreibt", "answer": "MANIFEST"}
         ]
     };
 

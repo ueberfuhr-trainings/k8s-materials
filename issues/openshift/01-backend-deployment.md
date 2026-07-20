@@ -10,15 +10,13 @@ Als Entwickler möchte ich das Recipes-Backend als Container in OpenShift deploy
 ## 🎯 Lernziele
 
 * Du kannst ein Deployment mit einem YAML-Manifest erstellen und auf den Cluster anwenden.
-* Du kannst Fehler in Pods mit `oc describe pod` und `oc logs` analysieren.
+* Du kannst den Status eines Pods prüfen.
 * Du kannst einen Service und eine Route erstellen, um eine Anwendung im Cluster und von außen erreichbar zu machen.
 
 ## ✅ Definition of Done
 
 * [ ] Du hast ein Deployment für das Backend erstellt und angewendet.
-* [ ] Du hast den Pod-Status geprüft und ggf. einen `ErrImagePull`-Fehler mit einem Pull Secret behoben.
-* [ ] Du hast die Fehlermeldung beim `latest`-Tag analysiert und verstanden.
-* [ ] Du hast das Image-Tag auf `latest-dev` geändert und der Pod läuft erfolgreich.
+* [ ] Der Backend-Pod läuft (Status `Running`).
 * [ ] Du hast einen Service und eine Route erstellt.
 * [ ] Du kannst die REST-API über die Route im Browser oder mit `curl` aufrufen.
 
@@ -45,10 +43,12 @@ spec:
     spec:
       containers:
         - name: recipes-backend
-          image: ralfueberfuhr/recipes-backend:latest
+          image: ralfueberfuhr/recipes-backend:latest-dev
           ports:
             - containerPort: 8080
 ```
+
+> **Hinweis:** Wir verwenden das Tag `latest-dev`. Dieses enthält eine eingebaute H2 InMemory-Datenbank und benötigt keine externe Datenbank — ideal für den ersten Schritt.
 
 Wende das Manifest an:
 
@@ -58,71 +58,34 @@ oc apply -f backend-deployment.yaml
 
 ### 2. Pod-Status prüfen
 
-Prüfe den Status des Pods:
+Prüfe, ob der Pod läuft:
 
 ```bash
 oc get pods
-oc describe pod <pod-name>
 ```
 
-Falls der Pod im Status `ErrImagePull` oder `ImagePullBackOff` steht, liegt das am Rate Limiting von Docker Hub für anonyme Zugriffe. In diesem Fall musst Du ein **Pull Secret** erstellen (siehe Schritt 3). Falls der Pod das Image erfolgreich ziehen konnte, kannst Du Schritt 3 überspringen und direkt mit Schritt 4 fortfahren.
+Nach kurzer Zeit sollte der Pod im Status `Running` sein.
 
-### 3. *(Falls nötig)* Pull Secret erstellen und Deployment ergänzen
+> **Troubleshooting:** Bleibt der Pod bei `ErrImagePull` oder `ImagePullBackOff` stehen, liegt das am Rate Limiting von Docker Hub für anonyme Zugriffe. Erstelle in diesem Fall ein **Pull Secret** und ergänze es im Deployment:
+>
+> ```bash
+> oc create secret docker-registry dockerhub-pull-secret \
+>   --docker-server=docker.io \
+>   --docker-username=<dein-dockerhub-username> \
+>   --docker-password=<dein-dockerhub-token>
+> ```
+>
+> ```yaml
+>     spec:
+>       imagePullSecrets:
+>         - name: dockerhub-pull-secret
+>       containers:
+>         - name: recipes-backend
+> ```
+>
+> Danach erneut `oc apply -f backend-deployment.yaml` ausführen.
 
-Erstelle ein Pull Secret mit Deinen Docker Hub-Zugangsdaten:
-
-```bash
-oc create secret docker-registry dockerhub-pull-secret \
-  --docker-server=docker.io \
-  --docker-username=<dein-dockerhub-username> \
-  --docker-password=<dein-dockerhub-token>
-```
-
-Ergänze im `backend-deployment.yaml` den Abschnitt `imagePullSecrets` im `spec`-Block des Pod-Templates:
-
-```yaml
-    spec:
-      imagePullSecrets:
-        - name: dockerhub-pull-secret
-      containers:
-        - name: recipes-backend
-```
-
-Wende das geänderte Manifest erneut an:
-
-```bash
-oc apply -f backend-deployment.yaml
-```
-
-### 4. Fehler analysieren — Datenbank
-
-Der Pod wird nun das Image ziehen können, aber in einen neuen Fehlerzustand laufen, weil das `latest`-Tag eine PostgreSQL-Datenbank erwartet:
-
-```bash
-oc get pods
-oc describe pod <pod-name>
-oc logs <pod-name>
-```
-
-Du solltest eine Fehlermeldung sehen, die auf eine fehlende Datenbankkonfiguration hinweist.
-
-### 5. Auf `latest-dev` wechseln
-
-Ändere in deinem YAML das Image-Tag von `latest` auf `latest-dev`. Dieses Tag enthält eine eingebaute H2 InMemory-Datenbank und benötigt keine externe Datenbank.
-
-```yaml
-          image: ralfueberfuhr/recipes-backend:latest-dev
-```
-
-Wende das geänderte Manifest erneut an und prüfe, ob der Pod jetzt läuft:
-
-```bash
-oc apply -f backend-deployment.yaml
-oc get pods
-oc logs <pod-name>
-```
-
-### 6. Service erstellen
+### 3. Service erstellen
 
 Erstelle eine Datei `backend-service.yaml`:
 
@@ -143,7 +106,7 @@ spec:
 oc apply -f backend-service.yaml
 ```
 
-### 7. Route erstellen
+### 4. Route erstellen
 
 Erstelle eine Datei `backend-route.yaml`:
 
@@ -170,7 +133,7 @@ oc get route recipes-backend
 Teste die API:
 
 ```bash
-curl -s https://<route-url>/recipes | jq
+curl -i https://<route-url>/recipes
 ```
 
 ## 📚 Selbstlernmaterial
@@ -186,4 +149,3 @@ curl -s https://<route-url>/recipes | jq
 * Wie ist der Zusammenhang zwischen einem Deployment und einem Pod?
 * Wozu verwenden wir einen Service?
 * Welche Rolle spielt die Route in OpenShift?
-* Welche Antwort erhalten wir, wenn kein Pod läuft?
