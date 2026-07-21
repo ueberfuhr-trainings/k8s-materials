@@ -51,10 +51,10 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 
 1. [Backend-Deployment](issues/kubernetes/01-backend-deployment.html) — Deployment, Service und Ingress für das Backend erstellen
 2. [Frontend-Deployment](issues/kubernetes/02-frontend-deployment.html) — Frontend deployen und mit dem Backend verbinden
-3. [Kreuzworträtsel](reflections/crossword-tag1.html) / [Quiz](reflections/quiz-tag1.html) — Wiederholung
 3. [ConfigMaps verwenden](issues/kubernetes/03-configmaps.html) — Konfiguration in ConfigMaps auslagern
-4. [PostgreSQL-Datenbank](issues/kubernetes/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
-5. [Backend auf PostgreSQL umschalten](issues/kubernetes/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
-6. [Persistent Volumes](issues/kubernetes/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
-7. [Liveness- und Readiness-Probes](issues/kubernetes/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
-8. [Helm Charts](issues/kubernetes/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+4. [Kreuzworträtsel](reflections/crossword-tag1.html) / [Quiz](reflections/quiz-tag1.html) — Wiederholung
+5. [PostgreSQL-Datenbank](issues/kubernetes/04-postgresql.html) — PostgreSQL deployen und mit Secrets/ConfigMaps konfigurieren
+6. [Backend auf PostgreSQL umschalten](issues/kubernetes/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
+7. [Persistent Volumes](issues/kubernetes/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
+8. [Liveness- und Readiness-Probes](issues/kubernetes/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
+9. [Helm Charts](issues/kubernetes/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
