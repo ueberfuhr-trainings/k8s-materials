@@ -15,6 +15,7 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 
 ## ✅ Definition of Done
 
+* [ ] Du hast für die PostgreSQL aus Übung 4 einen **Service** (Port 5432) erstellt.
 * [ ] Du hast das Backend-Deployment auf das `latest`-Tag umgestellt.
 * [ ] Du hast die Datenbank-Umgebungsvariablen konfiguriert (`DB_URL`, `DB_USER`, `DB_PASSWORD`).
 * [ ] `DB_USER` und `DB_PASSWORD` werden aus dem PostgreSQL-Secret bezogen.
@@ -23,7 +24,15 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 
 ## 🪜 Arbeitsschritte
 
-### 1. Image-Tag ändern
+### 1. PostgreSQL über einen Service erreichbar machen
+
+Damit das Backend die Datenbank über einen **stabilen Namen** statt über eine wechselnde Pod-IP erreicht, braucht die PostgreSQL aus Übung 4 einen **Service**. Erstelle ihn mit folgenden Anforderungen:
+
+* Er wählt die PostgreSQL-Pods über ihr Label aus (`app: postgres`).
+* Er ist clusterintern unter Port **5432** erreichbar.
+* Sein Name wird gleich als DNS-Hostname in der JDBC-URL verwendet — wähle ihn passend (z.B. `postgres`).
+
+### 2. Image-Tag ändern
 
 Ändere im Backend-Deployment das Image-Tag von `latest-dev` zurück auf `latest`:
 
@@ -31,7 +40,7 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 image: ralfueberfuhr/recipes-backend:latest
 ```
 
-### 2. Umgebungsvariablen konfigurieren
+### 3. Umgebungsvariablen konfigurieren
 
 Füge die Datenbank-Konfiguration zum Backend-Deployment hinzu. Verwende den Service-Namen der PostgreSQL als Hostname in der JDBC-URL:
 
@@ -51,9 +60,9 @@ env:
         key: POSTGRES_PASSWORD
 ```
 
-> **Hinweis:** Der Hostname `postgres` in der JDBC-URL entspricht dem Service-Namen aus Übung 4. Kubernetes stellt sicher, dass der Service-Name innerhalb des Clusters als DNS-Name aufgelöst wird.
+> **Hinweis:** Der Hostname `postgres` in der JDBC-URL entspricht dem Service-Namen aus Schritt 1. Kubernetes stellt sicher, dass der Service-Name innerhalb des Clusters als DNS-Name aufgelöst wird.
 
-### 3. Deployment anwenden und prüfen
+### 4. Deployment anwenden und prüfen
 
 ```bash
 oc apply -f backend-deployment.yaml
@@ -67,7 +76,7 @@ In den Logs sollte die erfolgreiche Verbindung zur PostgreSQL sichtbar sein. Pr�
 oc describe pod <backend-pod-name>
 ```
 
-### 4. Funktionstest
+### 5. Funktionstest
 
 Erstelle ein Rezept über die API und prüfe, ob es nach einem Pod-Neustart noch vorhanden ist:
 

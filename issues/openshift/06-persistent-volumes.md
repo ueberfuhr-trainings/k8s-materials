@@ -9,7 +9,7 @@ Als Entwickler möchte ich die PostgreSQL-Datenbank mit einem PersistentVolume b
 
 ## 🎯 Lernziele
 
-* Du verstehst den Unterschied zwischen `emptyDir` und PersistentVolumes.
+* Du verstehst den Unterschied zwischen flüchtigem Speicher (Container-Schreibschicht bzw. `emptyDir`) und persistentem Speicher (PersistentVolume).
 * Du kannst einen PersistentVolumeClaim (PVC) erstellen und in einem Deployment verwenden.
 * Du weißt, was eine StorageClass ist und wie dynamisches Provisioning funktioniert.
 * Du kannst überprüfen, ob Daten nach einem Pod-Neustart erhalten bleiben.
@@ -17,22 +17,16 @@ Als Entwickler möchte ich die PostgreSQL-Datenbank mit einem PersistentVolume b
 ## ✅ Definition of Done
 
 * [ ] Du hast einen PersistentVolumeClaim für die PostgreSQL-Daten erstellt.
-* [ ] Du hast das PostgreSQL-Deployment so angepasst, dass es den PVC statt `emptyDir` verwendet.
+* [ ] Du hast das PostgreSQL-Deployment so angepasst, dass es den PVC für die Datenbankdateien verwendet (inkl. `PGDATA` auf einem Unterverzeichnis).
 * [ ] Du kannst Daten in die Datenbank schreiben, den Pod neu starten und die Daten sind danach noch vorhanden.
 
 ## 🪜 Arbeitsschritte
 
 ### 1. Aktuelle Situation verstehen
 
-In Übung 4 haben wir für das PostgreSQL-Deployment ein `emptyDir`-Volume verwendet:
+In Übung 4 hatte das PostgreSQL-Deployment **kein eigenes Volume** für die Datenbankdateien — PostgreSQL schrieb sie in die **Schreibschicht des Containers**. Diese ist an die Lebensdauer des Pods gebunden: Wird der Pod gelöscht oder neu geplant, sind die Daten weg. Für eine Datenbank ist das nicht akzeptabel.
 
-```yaml
-volumes:
-  - name: data
-    emptyDir: {}
-```
-
-Ein `emptyDir`-Volume ist an die Lebensdauer des **Pods** gebunden — wird der Pod gelöscht oder neu gestartet, sind die Daten weg. Für eine Datenbank ist das nicht akzeptabel.
+Jetzt geben wir der Datenbank ein **persistentes** Volume, das den Pod überlebt.
 
 ### 2. Verfügbare StorageClasses prüfen
 
@@ -81,7 +75,30 @@ Der Status sollte `Bound` sein, sobald ein PV zugewiesen wurde.
 
 ### 4. PostgreSQL-Deployment anpassen
 
-Ersetze im PostgreSQL-Deployment das `emptyDir`-Volume durch eine Referenz auf den PVC:
+Jetzt bekommt die Datenbank ihr persistentes Volume. Ergänze im PostgreSQL-Deployment **drei** Dinge:
+
+**a) Das Datenverzeichnis per `PGDATA` festlegen** (Umgebungsvariable im Container):
+
+```yaml
+env:
+  - name: PGDATA
+    value: /var/lib/postgresql/data/pgdata
+```
+
+> **Warum `PGDATA`?** `PGDATA` bestimmt, wo PostgreSQL seine Datendateien ablegt. Der Default-Pfad bzw. das Verzeichnis-Layout hat sich über PostgreSQL-Versionen hinweg geändert — wir schreiben ihn deshalb **explizit fest**, damit das Setup versionsstabil bleibt. Außerdem legen wir die Daten in ein **Unterverzeichnis** (`.../pgdata`): Wird ein Volume direkt auf `/var/lib/postgresql/data` gemountet, ist dieses Mount-Root oft nicht leer (z.B. ein `lost+found`), und Postgres verweigert dann die Initialisierung. Der Unterordner umgeht das.
+
+**b) Das Volume in den Container mounten** (`subPath` passend zu `PGDATA`):
+
+```yaml
+volumeMounts:
+  - name: init-sql
+    mountPath: /docker-entrypoint-initdb.d
+  - name: data
+    mountPath: /var/lib/postgresql/data
+    subPath: pgdata
+```
+
+**c) Das `data`-Volume auf den PVC verweisen lassen:**
 
 ```yaml
 volumes:
