@@ -26,11 +26,9 @@ Als Entwickler möchte ich das Backend von der eingebauten H2-Datenbank auf die 
 
 ### 1. PostgreSQL über einen Service erreichbar machen
 
-Damit das Backend die Datenbank über einen **stabilen Namen** statt über eine wechselnde Pod-IP erreicht, braucht die PostgreSQL aus Übung 4 einen **Service**. Erstelle ihn mit folgenden Anforderungen:
+Damit das Backend die Datenbank über einen **stabilen Namen** statt über eine wechselnde Pod-IP erreicht, braucht die PostgreSQL aus Übung 4 einen **Service**.
 
-* Er wählt die PostgreSQL-Pods über ihr Label aus (`app: postgres`).
-* Er ist clusterintern unter Port **5432** erreichbar.
-* Sein Name wird gleich als DNS-Hostname in der JDBC-URL verwendet — wähle ihn passend (z.B. `postgres`).
+> **Hinweis:** Der Name des Service ist zugleich der Hostname, unter dem die Datenbank clusterintern erreichbar ist (und den du gleich in der JDBC-URL verwendest).
 
 ### 2. Image-Tag ändern
 
@@ -45,10 +43,8 @@ image: ralfueberfuhr/recipes-backend:latest
 Füge dem Backend-Deployment folgende Umgebungsvariablen hinzu:
 
 * **`DB_URL`** — JDBC-URL zur Datenbank: `jdbc:postgresql://postgres:5432/recipes` (Hostname = Service-Name aus Schritt 1)
-* **`DB_USER`** — aus dem `postgres-secret`, Schlüssel `POSTGRES_USER`
-* **`DB_PASSWORD`** — aus dem `postgres-secret`, Schlüssel `POSTGRES_PASSWORD`
-
-Überlege selbst, wie du einen statischen Wert (`DB_URL`) und Werte aus einem Secret (`DB_USER`, `DB_PASSWORD`) im Deployment angibst.
+* **`DB_USER`**
+* **`DB_PASSWORD`**
 
 > **Hinweis:** Der Hostname `postgres` in der JDBC-URL entspricht dem Service-Namen aus Schritt 1. Kubernetes löst den Service-Namen clusterintern als DNS-Namen auf.
 
@@ -88,5 +84,4 @@ curl -i http://<backend-ingress-url>/recipes
 
 ## 🤔 Reflexionsfragen
 
-* Brauchen wir für die Datenbank einen Ingress?
-* Ist es sinnvoll, die `DB_URL` auch im  `postgres-secret` bereitzustellen?
+* Gibt es für die Datenbank auch den Bedarf eines Ingress?

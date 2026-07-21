@@ -77,28 +77,7 @@ Der Status sollte `Bound` sein, sobald ein PV zugewiesen wurde.
 
 Jetzt bekommt die Datenbank ihr persistentes Volume. Ergänze im PostgreSQL-Deployment **drei** Dinge:
 
-**a) Das Datenverzeichnis per `PGDATA` festlegen** (Umgebungsvariable im Container):
-
-```yaml
-env:
-  - name: PGDATA
-    value: /var/lib/postgresql/data/pgdata
-```
-
-> **Warum `PGDATA`?** `PGDATA` bestimmt, wo PostgreSQL seine Datendateien ablegt. Der Default-Pfad bzw. das Verzeichnis-Layout hat sich über PostgreSQL-Versionen hinweg geändert — wir schreiben ihn deshalb **explizit fest**, damit das Setup versionsstabil bleibt. Außerdem legen wir die Daten in ein **Unterverzeichnis** (`.../pgdata`): Wird ein Volume direkt auf `/var/lib/postgresql/data` gemountet, ist dieses Mount-Root oft nicht leer (z.B. ein `lost+found`), und Postgres verweigert dann die Initialisierung. Der Unterordner umgeht das.
-
-**b) Das Volume in den Container mounten** (`subPath` passend zu `PGDATA`):
-
-```yaml
-volumeMounts:
-  - name: init-sql
-    mountPath: /docker-entrypoint-initdb.d
-  - name: data
-    mountPath: /var/lib/postgresql/data
-    subPath: pgdata
-```
-
-**c) Das `data`-Volume auf den PVC verweisen lassen:**
+**a) Das `data`-Volume auf den PVC verweisen lassen:**
 
 ```yaml
 volumes:
@@ -109,6 +88,25 @@ volumes:
     persistentVolumeClaim:
       claimName: postgres-data
 ```
+
+**b) Das Volume in den Container mounten** (`subPath` passend zu `PGDATA`):
+
+```yaml
+volumeMounts:
+  - name: data
+    mountPath: /var/lib/postgresql/data
+    subPath: pgdata
+```
+
+**c) Das Datenverzeichnis per `PGDATA` festlegen** (Umgebungsvariable im Container):
+
+```yaml
+env:
+  - name: PGDATA
+    value: /var/lib/postgresql/data/pgdata
+```
+
+> **Warum `PGDATA`?** `PGDATA` bestimmt, wo PostgreSQL seine Datendateien ablegt. Der Default-Pfad bzw. das Verzeichnis-Layout hat sich über PostgreSQL-Versionen hinweg geändert — wir schreiben ihn deshalb **explizit fest**, damit das Setup versionsstabil bleibt. Außerdem legen wir die Daten in ein **Unterverzeichnis** (`.../pgdata`): Wird ein Volume direkt auf `/var/lib/postgresql/data` gemountet, ist dieses Mount-Root oft nicht leer (z.B. ein `lost+found`), und Postgres verweigert dann die Initialisierung. Der Unterordner umgeht das.
 
 Wende das geänderte Manifest an:
 

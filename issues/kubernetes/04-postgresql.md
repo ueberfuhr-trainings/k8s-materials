@@ -30,9 +30,9 @@ Benötigt wird ein **Pod mit einer PostgreSQL-Datenbank**, der die folgenden Par
 |---|---|
 | Image | `postgres:17-alpine` |
 | Port | `5432` |
-| Umgebungsvariable `POSTGRES_USER` | frei wählbar, z.B. `recipes` |
-| Umgebungsvariable `POSTGRES_PASSWORD` | frei wählbar, z.B. `recipes-secret-pw` |
-| Umgebungsvariable `POSTGRES_DB` | `recipes` |
+| `POSTGRES_USER` (Umgebungsvariable) | frei wählbar, z.B. `recipes` |
+| `POSTGRES_PASSWORD` (Umgebungsvariable) | frei wählbar, z.B. `recipes-secret-pw` |
+| `POSTGRES_DB` (Umgebungsvariable) | `recipes` |
 | Init-SQL | Datei `init.sql` im Verzeichnis `/docker-entrypoint-initdb.d/` |
 
 Dabei gilt:
