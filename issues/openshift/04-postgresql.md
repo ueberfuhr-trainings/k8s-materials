@@ -21,6 +21,7 @@ Als Entwickler möchte ich eine PostgreSQL-Datenbank in OpenShift betreiben, der
 * [ ] Die Zugangsdaten stehen **nicht im Klartext** im Deployment-Manifest.
 * [ ] Der Datenbankname wird von außen konfiguriert (nicht fest im Deployment).
 * [ ] Das Init-SQL wird beim ersten Start ausgeführt und die Tabellen sind angelegt (in den Logs sichtbar).
+* [ ] Der Pod startet fehlerfrei — PostgreSQL hat ein eigenes Datenverzeichnis (`PGDATA` + Volume, siehe letzte Teilaufgabe).
 
 ## 🪜 Aufgabe
 
@@ -84,14 +85,59 @@ CREATE TABLE ingredients (
 
 * **Kein Persistent Volume nötig:** Für diese Übung genügt flüchtiger Speicher. Produktionsreif wäre ein **StatefulSet** mit PersistentVolumeClaim – siehe [PostgreSQL auf Kubernetes – Best Practices](../../docs/postgres-as-statefulset.html).
 
-## 🔎 Prüfung
+## 🔎 Zwischenstand prüfen
+
+Deploye die Ressourcen und sieh dir Pod-Status und Logs an:
 
 ```bash
 oc get pods
 oc logs <postgres-pod-name>
 ```
 
-In den Logs sollte die Ausführung des Init-Skripts (`init.sql`) sichtbar sein.
+Auf **OpenShift** wird der Pod **noch nicht** sauber starten. In den Logs steht ein Fehler beim Anlegen des Datenverzeichnisses:
+
+```
+fixing permissions on existing directory /var/lib/postgresql/data ... initdb: error: could not change permissions of directory "/var/lib/postgresql/data": Operation not permitted
+```
+
+Ursache: OpenShift startet den Container mit einer **willkürlich vergebenen User-ID** (SCC). PostgreSQL besitzt das Standard-Datenverzeichnis `/var/lib/postgresql/data` damit nicht und darf dessen Rechte nicht ändern.
+
+## 🧩 Letzte Teilaufgabe: eigenes Datenverzeichnis geben
+
+Behebe den Fehler, indem PostgreSQL ein **eigenes, beschreibbares** Datenverzeichnis bekommt. Ergänze im Deployment drei Dinge:
+
+1. die Umgebungsvariable **`PGDATA`** auf ein **Unterverzeichnis**,
+2. einen **`volumeMount`** für die Daten,
+3. das zugehörige **`volume`** (hier `emptyDir` — flüchtig, für diese Übung ausreichend).
+
+```yaml
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          # ports, envFrom (Secret + ConfigMap) wie zuvor …
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          emptyDir: {}
+```
+
+**Warum das hilft:** Das leere, beschreibbare `data`-Volume liegt auf `/var/lib/postgresql/data`. Durch `PGDATA=/var/lib/postgresql/data/pgdata` legt PostgreSQL sein Datenverzeichnis in ein **selbst angelegtes Unterverzeichnis** — dieses besitzt es und darf dessen Rechte setzen. Damit verschwindet der Fehler.
+
+Erneut anwenden und prüfen:
+
+```bash
+oc apply -f postgres-deployment.yaml
+oc get pods
+oc logs <postgres-pod-name>
+```
+
+Jetzt sollte der Pod laufen und die Ausführung des Init-Skripts (`init.sql`) in den Logs sichtbar sein.
 
 ## 📚 Selbstlernmaterial
 

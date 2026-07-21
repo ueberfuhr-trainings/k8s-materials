@@ -24,9 +24,15 @@ Als Entwickler möchte ich die PostgreSQL-Datenbank mit einem PersistentVolume b
 
 ### 1. Aktuelle Situation verstehen
 
-In Übung 4 hatte das PostgreSQL-Deployment **kein eigenes Volume** für die Datenbankdateien — PostgreSQL schrieb sie in die **Schreibschicht des Containers**. Diese ist an die Lebensdauer des Pods gebunden: Wird der Pod gelöscht oder neu geplant, sind die Daten weg. Für eine Datenbank ist das nicht akzeptabel.
+In Übung 4 nutzt das `data`-Volume der Datenbank ein **`emptyDir`**:
 
-Jetzt geben wir der Datenbank ein **persistentes** Volume, das den Pod überlebt.
+```yaml
+volumes:
+  - name: data
+    emptyDir: {}
+```
+
+Ein `emptyDir` ist an die Lebensdauer des **Pods** gebunden — wird der Pod gelöscht oder neu geplant, sind die Daten weg. Für eine Datenbank ist das nicht akzeptabel. Jetzt ersetzen wir es durch ein **persistentes** Volume (PVC), das den Pod überlebt.
 
 ### 2. Verfügbare StorageClasses prüfen
 
@@ -73,11 +79,9 @@ kubectl get pvc postgres-data
 
 Der Status sollte `Bound` sein, sobald ein PV zugewiesen wurde.
 
-### 4. PostgreSQL-Deployment anpassen
+### 4. PostgreSQL-Deployment auf den PVC umstellen
 
-Jetzt bekommt die Datenbank ihr persistentes Volume. Ergänze im PostgreSQL-Deployment **drei** Dinge:
-
-**a) Das `data`-Volume auf den PVC verweisen lassen:**
+Das Deployment aus Übung 4 mountet das `data`-Volume bereits unter `/var/lib/postgresql/data` (mit `PGDATA` auf dem Unterverzeichnis `pgdata`). Es muss also **nur das Volume selbst** von `emptyDir` auf den PVC umgestellt werden:
 
 ```yaml
 volumes:
@@ -89,24 +93,7 @@ volumes:
       claimName: postgres-data
 ```
 
-**b) Das Volume in den Container mounten** (`subPath` passend zu `PGDATA`):
-
-```yaml
-volumeMounts:
-  - name: data
-    mountPath: /var/lib/postgresql/data
-    subPath: pgdata
-```
-
-**c) Das Datenverzeichnis per `PGDATA` festlegen** (Umgebungsvariable im Container):
-
-```yaml
-env:
-  - name: PGDATA
-    value: /var/lib/postgresql/data/pgdata
-```
-
-> **Warum `PGDATA`?** `PGDATA` bestimmt, wo PostgreSQL seine Datendateien ablegt. Der Default-Pfad bzw. das Verzeichnis-Layout hat sich über PostgreSQL-Versionen hinweg geändert — wir schreiben ihn deshalb **explizit fest**, damit das Setup versionsstabil bleibt. Außerdem legen wir die Daten in ein **Unterverzeichnis** (`.../pgdata`): Wird ein Volume direkt auf `/var/lib/postgresql/data` gemountet, ist dieses Mount-Root oft nicht leer (z.B. ein `lost+found`), und Postgres verweigert dann die Initialisierung. Der Unterordner umgeht das.
+`volumeMounts`, `PGDATA` und die übrigen Einstellungen aus Übung 4 bleiben unverändert.
 
 Wende das geänderte Manifest an:
 

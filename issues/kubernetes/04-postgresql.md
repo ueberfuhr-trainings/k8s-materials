@@ -21,6 +21,7 @@ Als Entwickler möchte ich eine PostgreSQL-Datenbank in Kubernetes betreiben, de
 * [ ] Die Zugangsdaten stehen **nicht im Klartext** im Deployment-Manifest.
 * [ ] Der Datenbankname wird von außen konfiguriert (nicht fest im Deployment).
 * [ ] Das Init-SQL wird beim ersten Start ausgeführt und die Tabellen sind angelegt (in den Logs sichtbar).
+* [ ] PostgreSQL hat ein eigenes Datenverzeichnis (`PGDATA` + Volume, siehe letzte Teilaufgabe).
 
 ## 🪜 Aufgabe
 
@@ -84,7 +85,9 @@ CREATE TABLE ingredients (
 
 * **Kein Persistent Volume nötig:** Für diese Übung genügt flüchtiger Speicher. Produktionsreif wäre ein **StatefulSet** mit PersistentVolumeClaim – siehe [PostgreSQL auf Kubernetes – Best Practices](../../docs/postgres-as-statefulset.html).
 
-## 🔎 Prüfung
+## 🔎 Zwischenstand prüfen
+
+Deploye die Ressourcen und sieh dir Pod-Status und Logs an:
 
 ```bash
 kubectl get pods
@@ -92,6 +95,47 @@ kubectl logs <postgres-pod-name>
 ```
 
 In den Logs sollte die Ausführung des Init-Skripts (`init.sql`) sichtbar sein.
+
+> **Achtung, clusterabhängig:** Auf Clustern, die Container mit einer **willkürlich vergebenen User-ID** starten (insb. **OpenShift**), scheitert der Start hier mit einem Rechte-Fehler auf dem Datenverzeichnis:
+> ```
+> initdb: error: could not change permissions of directory "/var/lib/postgresql/data": Operation not permitted
+> ```
+> Auf Minikube tritt das meist nicht auf. Die folgende Teilaufgabe löst das Problem sauber — und bereitet zugleich Übung 6 (persistenter Speicher) vor.
+
+## 🧩 Letzte Teilaufgabe: eigenes Datenverzeichnis geben
+
+Gib PostgreSQL ein **eigenes, beschreibbares** Datenverzeichnis. Ergänze im Deployment drei Dinge:
+
+1. die Umgebungsvariable **`PGDATA`** auf ein **Unterverzeichnis**,
+2. einen **`volumeMount`** für die Daten,
+3. das zugehörige **`volume`** (hier `emptyDir` — flüchtig, für diese Übung ausreichend).
+
+```yaml
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          # ports, envFrom (Secret + ConfigMap) wie zuvor …
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          emptyDir: {}
+```
+
+**Warum das hilft:** Das leere, beschreibbare `data`-Volume liegt auf `/var/lib/postgresql/data`. Durch `PGDATA=/var/lib/postgresql/data/pgdata` legt PostgreSQL sein Datenverzeichnis in ein **selbst angelegtes Unterverzeichnis** — dieses besitzt es und darf dessen Rechte setzen.
+
+Erneut anwenden und prüfen:
+
+```bash
+kubectl apply -f postgres-deployment.yaml
+kubectl get pods
+kubectl logs <postgres-pod-name>
+```
 
 ## 📚 Selbstlernmaterial
 

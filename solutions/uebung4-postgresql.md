@@ -160,6 +160,9 @@ spec:
           image: postgres:17-alpine
           ports:
             - containerPort: 5432
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           envFrom:
             - secretRef:
                 name: postgres-secret
@@ -168,10 +171,14 @@ spec:
           volumeMounts:
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
+            - name: data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: init-sql
           configMap:
             name: postgres-init-sql
+        - name: data
+          emptyDir: {}
 ```
 
 ```bash
@@ -182,7 +189,7 @@ oc apply -f postgres-deployment.yaml
 
 - **`envFrom`** zieht *alle* Schlüssel aus Secret bzw. ConfigMap als Umgebungsvariablen (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`). Alternativ einzeln per `env` + `valueFrom: secretKeyRef` (siehe Übung 5).
 - **`init-sql` als Volume** landet unter `/docker-entrypoint-initdb.d`; das offizielle Image führt `*.sql` **nur beim ersten Start** aus (wenn das Datenverzeichnis leer ist).
-- **Kein Volume für die DB-Daten:** PostgreSQL schreibt hier einfach in die Schreibschicht des Containers. Das reicht, weil wir (noch) keine Persistenz brauchen — siehe Nachtrag unten und Übung 6.
+- **`PGDATA` + eigenes `data`-Volume (`emptyDir`):** Ohne das scheitert der Start auf OpenShift — die willkürlich vergebene User-ID darf `/var/lib/postgresql/data` nicht anpassen (`Operation not permitted`). Das `emptyDir` liefert ein beschreibbares Verzeichnis; `PGDATA=/var/lib/postgresql/data/pgdata` legt die Daten in ein selbst erstelltes Unterverzeichnis. Persistenz ist das noch nicht — siehe Nachtrag und Übung 6.
 
 ---
 
@@ -225,30 +232,10 @@ oc expose deployment postgres --port=5432 --target-port=5432
 
 ---
 
-## Nachtrag: optionales `data`-Volume (`emptyDir`)
-
-Man **könnte** dem PostgreSQL-Container zusätzlich ein eigenes Volume für die Datenbankdateien geben. In dieser Übung ist das **nicht nötig** — Postgres schreibt sonst einfach in die Schreibschicht des Containers, und da wir keine Persistenz haben, ist das Ergebnis dasselbe (Pod weg = Daten weg). Trotzdem hier zum Verständnis, wie es aussähe:
-
-```yaml
-          volumeMounts:
-            - name: init-sql
-              mountPath: /docker-entrypoint-initdb.d
-            - name: data
-              mountPath: /var/lib/postgresql/data
-              subPath: pgdata
-      volumes:
-        - name: init-sql
-          configMap:
-            name: postgres-init-sql
-        - name: data
-          emptyDir: {}
-```
+## Nachtrag: `emptyDir` verstehen — und der Weg zur Persistenz
 
 **Was ist `emptyDir`?** Ein `emptyDir` ist ein leeres Verzeichnis, das **auf dem Node** angelegt wird, auf dem der Pod läuft, und dort in den Container gemountet wird. Es lebt so lange wie der **Pod**: Ein Container-Neustart (Crash/Liveness) behält die Daten, aber beim Löschen oder Umziehen des Pods sind sie weg. Es ist also **kein** persistenter Speicher — im Gegensatz zu einem PersistentVolume, das unabhängig vom Pod existiert.
 
-**Warum dann überhaupt?** Zwei Gründe, beide für diese Übung nebensächlich:
+**Warum `PGDATA` auf ein Unterverzeichnis?** Würde PostgreSQL direkt in das Mount-Root `/var/lib/postgresql/data` schreiben, scheitert es in zwei Fällen: (1) auf **OpenShift**, weil die willkürlich vergebene User-ID die Rechte des Mount-Roots nicht ändern darf; (2) bei manchen **PVCs**, deren Mount-Root nicht leer ist (z.B. ein `lost+found`). Durch `PGDATA=/var/lib/postgresql/data/pgdata` legt PostgreSQL sein Datenverzeichnis in ein **selbst angelegtes Unterverzeichnis**, das es besitzt und dessen Rechte es setzen darf.
 
-- Es ist der **Platzhalter für einen PersistentVolumeClaim**: Mount-Pfad und `subPath` stimmen bereits, sodass man `emptyDir: {}` später mit einer Zeile durch einen PVC ersetzen kann. Genau das passiert in **Übung 6**.
-- Ein eigenes Volume umgeht das (langsamere) Copy-on-Write der Container-Schreibschicht. Für eine Dev-Datenbank irrelevant.
-
-> **`PGDATA` / `subPath`:** Sobald ein Volume auf `/var/lib/postgresql/data` gemountet wird, setzt man `PGDATA` auf ein Unterverzeichnis (`.../pgdata`) und mountet mit `subPath: pgdata`. Sonst kann Postgres an der Initialisierung scheitern, wenn das Mount-Root nicht leer ist (z.B. ein `lost+found`). Das ist erst mit Volume relevant — deshalb kommt `PGDATA` erst in **Übung 6** dazu.
+**Weg zur Persistenz:** In **Übung 6** wird das `emptyDir` mit einer Zeile durch einen `persistentVolumeClaim` ersetzt — `volumeMount` und `PGDATA` bleiben unverändert.
