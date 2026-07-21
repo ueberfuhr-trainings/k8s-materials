@@ -42,25 +42,15 @@ image: ralfueberfuhr/recipes-backend:latest
 
 ### 3. Umgebungsvariablen konfigurieren
 
-Füge die Datenbank-Konfiguration zum Backend-Deployment hinzu. Verwende den Service-Namen der PostgreSQL als Hostname in der JDBC-URL:
+Füge dem Backend-Deployment folgende Umgebungsvariablen hinzu:
 
-```yaml
-env:
-  - name: DB_URL
-    value: "jdbc:postgresql://postgres:5432/recipes"
-  - name: DB_USER
-    valueFrom:
-      secretKeyRef:
-        name: postgres-secret
-        key: POSTGRES_USER
-  - name: DB_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: postgres-secret
-        key: POSTGRES_PASSWORD
-```
+* **`DB_URL`** — JDBC-URL zur Datenbank: `jdbc:postgresql://postgres:5432/recipes` (Hostname = Service-Name aus Schritt 1)
+* **`DB_USER`** — aus dem `postgres-secret`, Schlüssel `POSTGRES_USER`
+* **`DB_PASSWORD`** — aus dem `postgres-secret`, Schlüssel `POSTGRES_PASSWORD`
 
-> **Hinweis:** Der Hostname `postgres` in der JDBC-URL entspricht dem Service-Namen aus Schritt 1. Kubernetes stellt sicher, dass der Service-Name innerhalb des Clusters als DNS-Name aufgelöst wird.
+Überlege selbst, wie du einen statischen Wert (`DB_URL`) und Werte aus einem Secret (`DB_USER`, `DB_PASSWORD`) im Deployment angibst.
+
+> **Hinweis:** Der Hostname `postgres` in der JDBC-URL entspricht dem Service-Namen aus Schritt 1. Kubernetes löst den Service-Namen clusterintern als DNS-Namen auf.
 
 ### 4. Deployment anwenden und prüfen
 
@@ -81,13 +71,13 @@ kubectl describe pod <backend-pod-name>
 Erstelle ein Rezept über die API und prüfe, ob es nach einem Pod-Neustart noch vorhanden ist:
 
 ```bash
-curl -s -X POST https://<backend-ingress-url>/recipes \
+curl -i -X POST http://<backend-ingress-url>/recipes \
   -H "Content-Type: application/json" \
-  -d '{"name":"Test","servings":2,"duration":10,"ingredients":[{"name":"Tomate","quantity":1,"unit":"pieces"}],"preparation":"Kochen."}' | jq
+  -d '{"name":"Test","servings":2,"duration":10,"ingredients":[{"name":"Tomate","quantity":1,"unit":"pieces"}],"preparation":"Kochen."}'
 
 kubectl rollout restart deployment/recipes-backend
 # Warten, bis der neue Pod läuft...
-curl -s https://<backend-ingress-url>/recipes | jq
+curl -i http://<backend-ingress-url>/recipes
 ```
 
 ## 📚 Selbstlernmaterial
