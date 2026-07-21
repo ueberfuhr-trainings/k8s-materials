@@ -43,7 +43,8 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 6. [Backend auf PostgreSQL umschalten](issues/openshift/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
 7. [Persistent Volumes](issues/openshift/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
 8. [Liveness- und Readiness-Probes](issues/openshift/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
-9. [Helm Charts](issues/openshift/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+9. [Helm: Datenbank-Chart & erste Schritte](issues/openshift/08-helm-charts.html) — Datenbank als Chart paketieren, Helm-CLI-Grundlagen, erstes Deployment
+10. [Helm: Backend & Frontend](issues/openshift/09-helm-backend-frontend.html) — Backend (und optional Frontend) als Charts mit Abhängigkeiten
 
 ## Übungen (Kubernetes)
 
@@ -57,4 +58,5 @@ In diesen Übungen deployt und konfiguriert Ihr eine Rezeptverwaltungs-Anwendung
 6. [Backend auf PostgreSQL umschalten](issues/kubernetes/05-backend-postgresql.html) — Backend mit externer Datenbank betreiben
 7. [Persistent Volumes](issues/kubernetes/06-persistent-volumes.html) — Persistenten Speicher für die PostgreSQL-Datenbank einrichten
 8. [Liveness- und Readiness-Probes](issues/kubernetes/07-probes.html) — Health Checks für Backend, Frontend und Datenbank
-9. [Helm Charts](issues/kubernetes/08-helm-charts.html) — Anwendung als Helm Charts paketieren und mit einem Befehl deployen
+9. [Helm: Datenbank-Chart & erste Schritte](issues/kubernetes/08-helm-charts.html) — Datenbank als Chart paketieren, Helm-CLI-Grundlagen, erstes Deployment
+10. [Helm: Backend & Frontend](issues/kubernetes/09-helm-backend-frontend.html) — Backend (und optional Frontend) als Charts mit Abhängigkeiten

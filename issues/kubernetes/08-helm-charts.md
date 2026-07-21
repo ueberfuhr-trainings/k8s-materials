@@ -1,75 +1,68 @@
 ---
 layout: default
-title: "Übung 8: Helm Charts"
+title: "Übung 8: Helm — Datenbank-Chart & erste Schritte"
 ---
 
-# Anwendung als Helm Charts paketieren
+# Datenbank als Helm Chart paketieren
 
-Als Entwickler möchte ich die gesamte Rezepte-Anwendung (Datenbank, Backend, Frontend) als Helm Charts paketieren, damit die Anwendung mit einem einzigen Befehl installiert werden kann.
+Als Entwickler möchte ich zunächst die Datenbank als Helm Chart paketieren und dabei die Helm-CLI kennenlernen, damit ich ein erstes Deployment über Helm durchführen kann.
 
 ## 🎯 Lernziele
 
-* Du kannst ein Helm Chart mit `helm create` erzeugen und an deine Bedürfnisse anpassen.
-* Du kannst bestehende Kubernetes-Manifeste in ein Chart überführen.
-* Du verstehst, wie man Werte in `values.yaml` auslagert und in Templates referenziert.
-* Du kannst die gesamte Anwendung mit `helm install` deployen.
+* Du kennst die Grundstruktur eines Helm Charts (`helm create`).
+* Du kannst bestehende Kubernetes-Manifeste in Chart-Templates überführen.
+* Du kannst Werte in `values.yaml` auslagern und in Templates referenzieren.
+* Du kannst mit der Helm-CLI ein Chart prüfen (`helm lint`, `helm template`) und installieren (`helm install`, `helm status`, `helm list`).
 
 ## ✅ Definition of Done
 
-* [ ] Du hast drei Helm Charts erstellt: `recipes-db`, `recipes-backend`, `recipes-frontend`.
-* [ ] Jedes Chart enthält die notwendigen Kubernetes-Ressourcen als Templates.
-* [ ] Mindestens einige Werte (z.B. Image-Tag, Replicas) sind in `values.yaml` ausgelagert.
-* [ ] Die Charts referenzieren sich gegenseitig als lokale Dependencies.
-* [ ] Die gesamte Anwendung lässt sich mit `helm install` über das Frontend-Chart deployen.
+* [ ] Die bisher manuell erstellten Ressourcen sind entfernt (sauberer Stand für Helm).
+* [ ] Es existiert ein Chart `recipes-db` mit den Datenbank-Ressourcen als Templates.
+* [ ] Einige Werte (z.B. Image-Tag, DB-Name/User/Passwort) sind in `values.yaml` ausgelagert.
+* [ ] Mit einer zweiten Werte-Datei (`values-prod.yaml`) und `helm template -f` hast du gezeigt, dass dasselbe Chart je Umgebung andere Manifeste erzeugt.
+* [ ] Die Datenbank ist per `helm install` deployt und der Pod läuft.
 
 ## 🪜 Arbeitsschritte
 
 ### 1. Bisherige Ressourcen aufräumen
 
-**Wichtig:** Bevor wir mit Helm deployen, müssen alle manuell erstellten Ressourcen entfernt werden, damit es keine Konflikte gibt:
+Ab jetzt übernimmt **Helm** das Deployment der Anwendung. Damit es keine Konflikte mit den zuvor manuell erstellten Objekten gibt, räumen wir auf:
 
 ```bash
-# Deployments
+# Deployments, Services, Ingresses
 kubectl delete deployment recipes-backend recipes-frontend postgres
-
-# Services
 kubectl delete service recipes-backend recipes-frontend postgres
-
-# Ingresses
 kubectl delete ingress recipes-backend recipes-frontend
 
 # ConfigMaps und Secrets
 kubectl delete configmap frontend-config postgres-config postgres-init-sql
 kubectl delete secret postgres-secret
 
-# PersistentVolumeClaim
+# PersistentVolumeClaim (falls in Übung 6 angelegt)
 kubectl delete pvc postgres-data
 
 # Prüfen, ob alles weg ist
 kubectl get all
-kubectl get configmap
-kubectl get secret
-kubectl get pvc
 ```
 
-### 2. Chart-Grundgerüste erzeugen
+> Fehlermeldungen zu bereits nicht mehr vorhandenen Objekten kannst Du ignorieren.
 
-Erstelle einen gemeinsamen Ordner und darin drei Charts:
+### 2. Erstes Chart erzeugen
+
+Erstelle einen gemeinsamen Ordner und darin das DB-Chart:
 
 ```bash
 mkdir helm-charts
 cd helm-charts
 
 helm create recipes-db
-helm create recipes-backend
-helm create recipes-frontend
 ```
 
-`helm create` erzeugt ein vollständiges Beispiel-Chart. Schau Dir die generierten Dateien gern an.
+`helm create` erzeugt ein vollständiges Beispiel-Chart. **Schau Dir die generierten Dateien an** (`Chart.yaml`, `values.yaml`, `templates/`) — das ist der beste Einstieg in die Chart-Struktur.
 
 ### 3. Chart.yaml anpassen
 
-Passe die `Chart.yaml` jedes Charts an. Beispiel für `recipes-db/Chart.yaml`:
+Passe `recipes-db/Chart.yaml` an:
 
 ```yaml
 apiVersion: v2
@@ -80,31 +73,22 @@ appVersion: "17"
 type: application
 ```
 
-### 4. YAML-Manifeste übernehmen
+### 4. Deine DB-Manifeste als Templates übernehmen
 
-Kopiere deine bestehenden YAML-Manifeste in den `templates/`-Ordner des jeweiligen Charts. Bereits bestehende YAML-Dateien kannst Du löschen bzw. überschreiben.
+Lösche die von `helm create` generierten Beispiel-Templates im Ordner `recipes-db/templates/` und lege stattdessen deine Datenbank-Manifeste aus Übung 4 dort ab (Secret, ConfigMap für den DB-Namen, ConfigMap fürs Init-SQL, Deployment, Service). Die generierte `values.yaml` kannst Du zunächst leeren.
 
-### 5. Charts prüfen
+### 5. Chart prüfen (erste Helm-CLI-Schritte)
 
-Prüfe jedes Chart auf Syntaxfehler:
+Prüfe das Chart auf Syntaxfehler und sieh dir die gerenderten Manifeste an, **ohne** etwas zu installieren:
 
 ```bash
 helm lint ./recipes-db
-helm lint ./recipes-backend
-helm lint ./recipes-frontend
-```
-
-Du kannst dir auch die gerenderten Templates anschauen, ohne etwas zu installieren:
-
-```bash
 helm template test-release ./recipes-db
 ```
 
 ### 6. Werte in values.yaml auslagern
 
 Jetzt kommt der eigentliche Mehrwert: Ersetze hart kodierte Werte in den Templates durch Referenzen auf `values.yaml`. Beginne mit ein paar wichtigen Werten — nicht alles auf einmal.
-
-**Beispiel für `recipes-db`:**
 
 `recipes-db/values.yaml`:
 
@@ -121,7 +105,6 @@ database:
 
 In `recipes-db/templates/deployment.yaml` ersetzt du dann z.B.:
 
-{% raw %}
 ```yaml
 # Vorher:
 image: postgres:17-alpine
@@ -129,23 +112,14 @@ image: postgres:17-alpine
 # Nachher:
 image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
 ```
-{% endraw %}
 
-Und in `recipes-db/templates/secret.yaml`:
+Und im Secret (Helm kann Klartext über `stringData` verwenden):
 
-{% raw %}
 ```yaml
-# Vorher:
-data:
-  POSTGRES_USER: cmVjaXBlcw==
-  POSTGRES_PASSWORD: cmVjaXBlcy1zZWNyZXQtcHc=
-
-# Nachher (mit stringData statt data — Helm kann Klartext verwenden):
 stringData:
   POSTGRES_USER: {{ .Values.database.user }}
   POSTGRES_PASSWORD: {{ .Values.database.password }}
 ```
-{% endraw %}
 
 Nach jeder Änderung erneut prüfen:
 
@@ -154,77 +128,54 @@ helm lint ./recipes-db
 helm template test-release ./recipes-db
 ```
 
-### 7. Charts als Pakete erzeugen (optional)
+### 7. Parameterisierung sichtbar machen: zweite Umgebung
 
-Du kannst jedes Chart als `.tgz`-Archiv verpacken:
+Der eigentliche Nutzen der Auslagerung zeigt sich, wenn **dieselben Templates** mit **unterschiedlichen Werten** gerendert werden. Lege dafür eine zweite Werte-Datei für eine andere Umgebung an — hier für die Produktion. Sie enthält nur die **Abweichungen** von der Standard-`values.yaml`:
 
-```bash
-helm package ./recipes-db
-helm package ./recipes-backend
-helm package ./recipes-frontend
-```
-
-Das erzeugt Dateien wie `recipes-db-0.1.0.tgz`. So könnten Charts in ein Repository oder eine OCI-Registry gepusht werden.
-
-### 8. Abhängigkeiten definieren
-
-Das Frontend braucht das Backend, und das Backend braucht die Datenbank. Definiere das über lokale `file://`-Referenzen in der `Chart.yaml`.
-
-**`recipes-backend/Chart.yaml`** :
+`recipes-db/values-prod.yaml`:
 
 ```yaml
-dependencies:
-  - name: recipes-db
-    version: "0.1.0"
-    repository: "file://../recipes-db"
+image:
+  tag: "17"
+replicas: 3
+database:
+  name: recipes_prod
 ```
 
-**`recipes-frontend/Chart.yaml`**:
-
-```yaml
-dependencies:
-  - name: recipes-backend
-    version: "0.1.0"
-    repository: "file://../recipes-backend"
-```
-
-### 9. Abhängigkeiten auflösen
-
-Lade die Dependencies herunter — die Reihenfolge ist wichtig, weil die Charts aufeinander aufbauen:
+Rendere das Chart nun einmal mit den Standardwerten und einmal mit der Prod-Datei und **vergleiche die Ausgabe**:
 
 ```bash
-# 1. DB hat keine Dependencies — nichts zu tun
-helm dependency update ./recipes-db
+# Standard (values.yaml)
+helm template test-release ./recipes-db
 
-# 2. Backend hängt von DB ab
-helm dependency update ./recipes-backend
-
-# 3. Frontend hängt von Backend ab (das wiederum DB mitbringt)
-helm dependency update ./recipes-frontend
+# Mit Overlay für die Produktion
+helm template test-release ./recipes-db -f ./recipes-db/values-prod.yaml
 ```
 
-Nach jedem Befehl erscheint eine `Chart.lock`-Datei und im `charts/`-Ordner das jeweilige Dependency-Archiv.
+Die mit `-f` übergebene Datei **überschreibt** nur die dort gesetzten Werte; alles andere kommt weiterhin aus der `values.yaml`. So erzeugt **ein** Chart je nach Umgebung unterschiedliche Manifeste (anderes Image-Tag, mehr Replicas, anderer DB-Name).
 
-### 10. Alles installieren
+> Beim Installieren funktioniert das genauso: `helm install recipes-db ./recipes-db -f ./recipes-db/values-prod.yaml`.
 
-Ein einziger Befehl installiert jetzt die gesamte Anwendung — Frontend, Backend und Datenbank:
+### 8. Erstes Deployment über Helm
+
+Installiere die Datenbank als Helm-Release:
 
 ```bash
-helm install recipes ./recipes-frontend
+helm install recipes-db ./recipes-db
 ```
 
-Beobachte den Fortschritt:
+Beobachte den Fortschritt und die installierten Releases:
 
 ```bash
 kubectl get pods -w
-helm status recipes
+helm list
+helm status recipes-db
 ```
 
-Prüfe, ob die Anwendung funktioniert:
+Prüfe die Logs — das Init-SQL sollte ausgeführt worden sein:
 
 ```bash
-kubectl get ingress
-curl -s http://<backend-ingress-url>/recipes | jq
+kubectl logs deployment/postgres
 ```
 
 ## 📚 Selbstlernmaterial
@@ -233,12 +184,11 @@ curl -s http://<backend-ingress-url>/recipes | jq
 * [Aufbau eines Helm Charts](../../docs/helm-chart-struktur.html) — Alle Dateien und Verzeichnisse im Detail
 * [Helm Cheat Sheet](../../docs/helm-cheatsheet.html) — Die wichtigsten Helm-Befehle
 * [Helm Template-Guide](https://helm.sh/docs/chart_template_guide/)
-* [Helm Dependency Management](https://helm.sh/docs/helm/helm_dependency/)
 
 ## 🤔 Reflexionsfragen
 
 * Welche Werte lohnt es sich, in die `values.yaml` auszulagern? Welche können hart kodiert bleiben?
-* Welche Vorteile hat die Nutzung von Helm Charts gegenüber den einzelnen YAML-Manifesten, die wir zuvor verwendet haben?
+* Welche Vorteile hat ein Helm Chart gegenüber den einzelnen YAML-Manifesten, die wir zuvor verwendet haben?
 * Warum mussten wir die bisherigen Ressourcen löschen, bevor wir mit Helm installiert haben?
-* Was wäre der Vorteil, die Charts in eine OCI-Registry zu pushen, statt sie nur lokal zu verwenden?
-* Wie würdest du unterschiedliche Konfigurationen für Dev und Prod abbilden?
+* Wofür ist `helm template` nützlich, bevor man `helm install` ausführt?
+* Wie hilft eine zweite Werte-Datei (`-f values-prod.yaml`) dabei, dieselbe Anwendung in mehreren Umgebungen zu betreiben?
